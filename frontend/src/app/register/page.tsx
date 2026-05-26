@@ -8,8 +8,8 @@ import {
   AuthSubmitButton,
   AuthTextField,
 } from "@/components/forms";
-import type { FormState } from "@/types/form-state.type";
-import { hasEmptyFields, isValidEmail } from "@/utils/validation.util";
+import type { FieldError, FormState } from "@/types/form-state.type";
+import { isRequired, isValidEmail } from "@/utils/validation.util";
 
 interface RegisterForm {
   firstName: string;
@@ -29,12 +29,17 @@ const initialForm: RegisterForm = {
 
 export default function RegisterPage() {
   const [form, setForm] = useState<RegisterForm>(initialForm);
+  const [fieldErrors, setFieldErrors] = useState<FieldError[]>([]);
 
   const [formState, setFormState] = useState<FormState>({
     isLoading: false,
     error: null,
     success: null,
   });
+
+  const getFieldError = (field: keyof RegisterForm) => {
+    return fieldErrors.find((error) => error.field === field)?.message;
+  };
 
   const updateField = (field: keyof RegisterForm, value: string) => {
     setForm((currentForm) => ({
@@ -43,9 +48,7 @@ export default function RegisterPage() {
     }));
   };
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const validateForm = () => {
     const cleanForm: RegisterForm = {
       firstName: form.firstName.trim(),
       lastName: form.lastName.trim(),
@@ -54,28 +57,72 @@ export default function RegisterPage() {
       mobile: form.mobile.trim(),
     };
 
-    if (hasEmptyFields(Object.values(cleanForm))) {
-      setFormState({
-        isLoading: false,
-        error: "Completa todos los campos antes de registrarte.",
-        success: null,
+    const errors: FieldError[] = [];
+
+    if (!isRequired(cleanForm.firstName)) {
+      errors.push({
+        field: "firstName",
+        message: "El nombre es obligatorio.",
       });
-      return;
     }
 
-    if (!isValidEmail(cleanForm.email)) {
-      setFormState({
-        isLoading: false,
-        error: "Ingresa un correo válido.",
-        success: null,
+    if (!isRequired(cleanForm.lastName)) {
+      errors.push({
+        field: "lastName",
+        message: "El apellido es obligatorio.",
       });
-      return;
     }
 
-    if (cleanForm.password.length < 4) {
+    if (!isRequired(cleanForm.email)) {
+      errors.push({
+        field: "email",
+        message: "El correo es obligatorio.",
+      });
+    } else if (!isValidEmail(cleanForm.email)) {
+      errors.push({
+        field: "email",
+        message: "Ingresa un correo válido.",
+      });
+    }
+
+    if (!isRequired(cleanForm.mobile)) {
+      errors.push({
+        field: "mobile",
+        message: "El celular es obligatorio.",
+      });
+    }
+
+    if (!isRequired(cleanForm.password)) {
+      errors.push({
+        field: "password",
+        message: "La contraseña es obligatoria.",
+      });
+    } else if (cleanForm.password.length < 4) {
+      errors.push({
+        field: "password",
+        message: "La contraseña debe tener al menos 4 caracteres.",
+      });
+    }
+
+    setFieldErrors(errors);
+    return errors.length === 0;
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    setFormState({
+      isLoading: false,
+      error: null,
+      success: null,
+    });
+
+    const isValid = validateForm();
+
+    if (!isValid) {
       setFormState({
         isLoading: false,
-        error: "La contraseña debe tener al menos 4 caracteres.",
+        error: "Revisa los campos marcados antes de continuar.",
         success: null,
       });
       return;
@@ -91,6 +138,7 @@ export default function RegisterPage() {
       await new Promise((resolve) => setTimeout(resolve, 900));
 
       setForm(initialForm);
+      setFieldErrors([]);
 
       setFormState({
         isLoading: false,
@@ -125,6 +173,7 @@ export default function RegisterPage() {
             onChange={(value) => updateField("firstName", value)}
             placeholder="Juan"
             disabled={formState.isLoading}
+            error={getFieldError("firstName")}
           />
 
           <AuthTextField
@@ -135,6 +184,7 @@ export default function RegisterPage() {
             onChange={(value) => updateField("lastName", value)}
             placeholder="Pérez"
             disabled={formState.isLoading}
+            error={getFieldError("lastName")}
           />
         </div>
 
@@ -147,6 +197,7 @@ export default function RegisterPage() {
           onChange={(value) => updateField("email", value)}
           placeholder="usuario@correo.com"
           disabled={formState.isLoading}
+          error={getFieldError("email")}
         />
 
         <AuthTextField
@@ -158,6 +209,7 @@ export default function RegisterPage() {
           onChange={(value) => updateField("mobile", value)}
           placeholder="70000000"
           disabled={formState.isLoading}
+          error={getFieldError("mobile")}
         />
 
         <AuthTextField
@@ -169,6 +221,7 @@ export default function RegisterPage() {
           onChange={(value) => updateField("password", value)}
           placeholder="Mínimo 4 caracteres"
           disabled={formState.isLoading}
+          error={getFieldError("password")}
         />
 
         <AuthFeedback formState={formState} />

@@ -8,12 +8,14 @@ import {
   AuthSubmitButton,
   AuthTextField,
 } from "@/components/forms";
-import type { FormState } from "@/types/form-state.type";
+import type { FieldError, FormState } from "@/types/form-state.type";
 import { isRequired, isValidEmail } from "@/utils/validation.util";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const [fieldErrors, setFieldErrors] = useState<FieldError[]>([]);
 
   const [formState, setFormState] = useState<FormState>({
     isLoading: false,
@@ -21,25 +23,53 @@ export default function LoginPage() {
     success: null,
   });
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const getFieldError = (field: string) => {
+    return fieldErrors.find((error) => error.field === field)?.message;
+  };
 
+  const validateForm = () => {
+    const errors: FieldError[] = [];
     const cleanEmail = email.trim();
     const cleanPassword = password.trim();
 
-    if (!isRequired(cleanEmail) || !isRequired(cleanPassword)) {
-      setFormState({
-        isLoading: false,
-        error: "Completa el correo y la contraseña.",
-        success: null,
+    if (!isRequired(cleanEmail)) {
+      errors.push({
+        field: "email",
+        message: "El correo es obligatorio.",
       });
-      return;
+    } else if (!isValidEmail(cleanEmail)) {
+      errors.push({
+        field: "email",
+        message: "Ingresa un correo válido.",
+      });
     }
 
-    if (!isValidEmail(cleanEmail)) {
+    if (!isRequired(cleanPassword)) {
+      errors.push({
+        field: "password",
+        message: "La contraseña es obligatoria.",
+      });
+    }
+
+    setFieldErrors(errors);
+    return errors.length === 0;
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    setFormState({
+      isLoading: false,
+      error: null,
+      success: null,
+    });
+
+    const isValid = validateForm();
+
+    if (!isValid) {
       setFormState({
         isLoading: false,
-        error: "Ingresa un correo válido.",
+        error: "Revisa los campos marcados antes de continuar.",
         success: null,
       });
       return;
@@ -87,6 +117,7 @@ export default function LoginPage() {
           onChange={setEmail}
           placeholder="usuario@correo.com"
           disabled={formState.isLoading}
+          error={getFieldError("email")}
         />
 
         <AuthTextField
@@ -98,6 +129,7 @@ export default function LoginPage() {
           onChange={setPassword}
           placeholder="Tu contraseña"
           disabled={formState.isLoading}
+          error={getFieldError("password")}
         />
 
         <AuthFeedback formState={formState} />
