@@ -8,16 +8,12 @@ import {
   AuthSubmitButton,
   AuthTextField,
 } from "@/components/forms";
+import { simulateSignup } from "@/components/forms/auth-mock.actions";
+import type { SignupRequest } from "@/models/auth.model";
 import type { FieldError, FormState } from "@/types/form-state.type";
 import { isRequired, isValidEmail } from "@/utils/validation.util";
 
-interface RegisterForm {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  mobile: string;
-}
+type RegisterForm = SignupRequest;
 
 const initialForm: RegisterForm = {
   firstName: "",
@@ -128,6 +124,14 @@ export default function RegisterPage() {
       return;
     }
 
+    const signupData: SignupRequest = {
+      firstName: form.firstName.trim(),
+      lastName: form.lastName.trim(),
+      email: form.email.trim(),
+      password: form.password.trim(),
+      mobile: form.mobile.trim(),
+    };
+
     try {
       setFormState({
         isLoading: true,
@@ -135,7 +139,8 @@ export default function RegisterPage() {
         success: null,
       });
 
-      await new Promise((resolve) => setTimeout(resolve, 900));
+      // TODO: Reemplazar por signup(signupData) desde useAuth cuando Persona 3 termine el AuthContext.
+      await simulateSignup(signupData);
 
       setForm(initialForm);
       setFieldErrors([]);

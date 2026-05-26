@@ -8,6 +8,8 @@ import {
   AuthSubmitButton,
   AuthTextField,
 } from "@/components/forms";
+import { simulateSignin } from "@/components/forms/auth-mock.actions";
+import type { SigninCredentials } from "@/models/auth.model";
 import type { FieldError, FormState } from "@/types/form-state.type";
 import { isRequired, isValidEmail } from "@/utils/validation.util";
 
@@ -75,6 +77,11 @@ export default function LoginPage() {
       return;
     }
 
+    const credentials: SigninCredentials = {
+      email: email.trim(),
+      password: password.trim(),
+    };
+
     try {
       setFormState({
         isLoading: true,
@@ -82,7 +89,8 @@ export default function LoginPage() {
         success: null,
       });
 
-      await new Promise((resolve) => setTimeout(resolve, 900));
+      // TODO: Reemplazar por signin(credentials) desde useAuth cuando Persona 3 termine el AuthContext.
+      await simulateSignin(credentials);
 
       setFormState({
         isLoading: false,
