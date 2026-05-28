@@ -1,6 +1,7 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import {
   AuthFeedback,
@@ -8,12 +9,15 @@ import {
   AuthSubmitButton,
   AuthTextField,
 } from "@/components/forms";
-import { simulateSignin } from "@/components/forms/auth-mock.actions";
+import { useAuth } from "@/hooks/useAuth";
 import type { SigninCredentials } from "@/models/auth.model";
 import type { FieldError, FormState } from "@/types/form-state.type";
 import { isRequired, isValidEmail } from "@/utils/validation.util";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { signin } = useAuth();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -89,22 +93,24 @@ export default function LoginPage() {
         success: null,
       });
 
-      // TODO: Reemplazar por signin(credentials) desde useAuth cuando Persona 3 termine el AuthContext.
-      await simulateSignin(credentials);
+      await signin(credentials);
 
       setFormState({
         isLoading: false,
         error: null,
-        success: "Login validado visualmente. Pendiente conexión con useAuth.",
+        success: "¡Sesión iniciada con éxito!",
       });
-    } catch {
+
+      router.push("/");
+    } catch (error: any) {
       setFormState({
         isLoading: false,
-        error: "No se pudo iniciar sesión. Intenta nuevamente.",
+        error: error instanceof Error ? error.message : "Credenciales incorrectas.",
         success: null,
       });
     }
   };
+
 
   return (
     <AuthPageShell
