@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ShopWave E-commerce - Frontend
 
-## Getting Started
+Proyecto final de Tecnologías Web II.
 
-First, run the development server:
+Este frontend está desarrollado con Next.js, TypeScript y Tailwind CSS. Su objetivo es consumir la API de ShopWave Fusion desarrollada en Spring Boot, utilizando JWT para autenticación y servicios desacoplados para mantener una arquitectura limpia.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Tecnologías utilizadas
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Next.js con App Router
+- TypeScript
+- Tailwind CSS
+- Fetch API
+- JWT
+- LocalStorage
+- Git y GitHub
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Rol trabajado: Persona 5 - Motor de Datos y Servicios
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+La Persona 5 se encarga de construir la capa de comunicación entre el frontend y el backend.
 
-## Learn More
+Responsabilidades implementadas:
 
-To learn more about Next.js, take a look at the following resources:
+- Definición de modelos TypeScript.
+- Definición de tipos compartidos.
+- Servicio HTTP base.
+- Servicios desacoplados para productos, autenticación, carrito, órdenes y usuario.
+- Manejo básico de JWT desde utilidades.
+- Hook personalizado `useProducts`.
+- Documentación técnica del frontend.
+- Colección de pruebas para Postman.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Estructura trabajada
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```txt
+src/
+├── hooks/
+│   └── useProducts.ts
+├── models/
+│   ├── auth.model.ts
+│   ├── cart.model.ts
+│   ├── order.model.ts
+│   ├── product.model.ts
+│   └── user.model.ts
+├── services/
+│   ├── api.service.ts
+│   ├── auth.service.ts
+│   ├── cart.service.ts
+│   ├── order.service.ts
+│   ├── product.service.ts
+│   └── user.service.ts
+├── types/
+│   ├── api-response.type.ts
+│   └── role.type.ts
+└── utils/
+    ├── currency.util.ts
+    └── token.util.ts

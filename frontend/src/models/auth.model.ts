@@ -13,7 +13,7 @@ export interface SignupRequest {
   mobile: string;
 }
 
-export interface AuthUser extends User {}
+export type AuthUser = User;
 
 export interface AuthState {
   user: AuthUser | null;
