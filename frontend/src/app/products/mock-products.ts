@@ -12,7 +12,7 @@ export const mockProducts: Product[] = [
     brand: "TechGear",
     color: "Negro",
     sizes: [], // Es un array obligatorio según el modelo, aunque esté vacío
-    imageUrl: "/images/teclado.jpg" 
+    imageUrl: "/images/teclado.jpg/" 
   },
   {
     id: 2,
