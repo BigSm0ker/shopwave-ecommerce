@@ -25,6 +25,6 @@ export const mockProducts: Product[] = [
     brand: "GamerPro",
     color: "Blanco",
     sizes: [],
-    imageUrl: "/images/mouse.jpg/"
+    imageUrl: "/images/mouse.jpg"
   }
 ];
