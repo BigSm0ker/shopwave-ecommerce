@@ -22,4 +22,4 @@ export interface User {
   createdAt?: string;
 }
 
-export interface UserProfile extends User {}
+export type UserProfile = User;

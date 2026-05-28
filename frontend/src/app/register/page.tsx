@@ -1,6 +1,7 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import {
   AuthFeedback,
@@ -8,7 +9,7 @@ import {
   AuthSubmitButton,
   AuthTextField,
 } from "@/components/forms";
-import { simulateSignup } from "@/components/forms/auth-mock.actions";
+import { useAuth } from "@/hooks/useAuth";
 import type { SignupRequest } from "@/models/auth.model";
 import type { FieldError, FormState } from "@/types/form-state.type";
 import { isRequired, isValidEmail } from "@/utils/validation.util";
@@ -24,6 +25,9 @@ const initialForm: RegisterForm = {
 };
 
 export default function RegisterPage() {
+  const router = useRouter();
+  const { signup } = useAuth();
+  
   const [form, setForm] = useState<RegisterForm>(initialForm);
   const [fieldErrors, setFieldErrors] = useState<FieldError[]>([]);
 
@@ -139,8 +143,7 @@ export default function RegisterPage() {
         success: null,
       });
 
-      // TODO: Reemplazar por signup(signupData) desde useAuth cuando Persona 3 termine el AuthContext.
-      await simulateSignup(signupData);
+      await signup(signupData);
 
       setForm(initialForm);
       setFieldErrors([]);
@@ -148,16 +151,21 @@ export default function RegisterPage() {
       setFormState({
         isLoading: false,
         error: null,
-        success: "Registro validado visualmente. Pendiente conexión con auth.service.",
+        success: "¡Registro exitoso! Redirigiendo a inicio de sesión...",
       });
-    } catch {
+
+      setTimeout(() => {
+        router.push("/login");
+      }, 1500);
+    } catch (error: any) {
       setFormState({
         isLoading: false,
-        error: "No se pudo completar el registro. Intenta nuevamente.",
+        error: error instanceof Error ? error.message : "No se pudo completar el registro. Intenta nuevamente.",
         success: null,
       });
     }
   };
+
 
   return (
     <AuthPageShell
