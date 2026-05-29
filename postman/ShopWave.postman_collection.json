@@ -1,0 +1,527 @@
+{
+	"info": {
+		"_postman_id": "893c52a0-47de-4752-a56e-8d965e638b97",
+		"name": "ShopWave E-commerce - Productos",
+		"description": "Colección de pruebas para endpoints de productos (públicos y administrativos) del proyecto ShopWave.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Autenticación",
+			"item": [
+				{
+					"name": "Login Administrador (Basic Auth)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jwtToken = pm.response.headers.get(\"Authorization\");",
+									"if (jwtToken) {",
+									"    pm.collectionVariables.set(\"jwtToken\", jwtToken);",
+									"    pm.test(\"Token JWT extraído y guardado en variable jwtToken\", function() {",
+									"        pm.expect(jwtToken).to.be.a('string').and.not.empty;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@example.com",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/auth/signin",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"signin"
+							]
+						},
+						"description": "Realiza el login usando Basic Auth con el usuario admin por defecto del proyecto. Guarda el token JWT devuelto en la cabecera 'Authorization' para usarlo en las llamadas de administrador."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Productos - Público",
+			"item": [
+				{
+					"name": "Obtener Todos los Productos",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Retorna una lista de productos en formato array\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products"
+							]
+						},
+						"description": "Obtiene la lista completa de todos los productos disponibles."
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Producto por ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"El producto contiene los campos esenciales\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('title');",
+									"    pm.expect(jsonData).to.have.property('price');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"1"
+							]
+						},
+						"description": "Busca un producto específico mediante su ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar Productos por Palabra Clave",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Los resultados de búsqueda vienen en formato array\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/search?q=Camiseta",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "Camiseta"
+								}
+							]
+						},
+						"description": "Busca productos que coincidan con la palabra clave ingresada en el parámetro 'q'."
+					},
+					"response": []
+				},
+				{
+					"name": "Productos por Categoría",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Retorna una estructura de página con contenido de productos\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('content');",
+									"    pm.expect(jsonData.content).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/by-category?categoryName=Camisetas&page=0&pageSize=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"by-category"
+							],
+							"query": [
+								{
+									"key": "categoryName",
+									"value": "Camisetas"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Filtra productos según el nombre de la categoría, con soporte para paginación."
+					},
+					"response": []
+				},
+				{
+					"name": "Productos Ordenados por Precio",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/sorted?sort=asc&page=0&pageSize=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"sorted"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "asc"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Retorna productos ordenados de forma ascendente o descendente según su precio con descuento."
+					},
+					"response": []
+				},
+				{
+					"name": "Filtrar Productos (Paginación y Parámetros Múltiples)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/all?category=Camisetas&minPrice=10000&maxPrice=100000&minDiscount=10&pageNumber=0&pageSize=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"all"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "Camisetas"
+								},
+								{
+									"key": "minPrice",
+									"value": "10000"
+								},
+								{
+									"key": "maxPrice",
+									"value": "100000"
+								},
+								{
+									"key": "minDiscount",
+									"value": "10"
+								},
+								{
+									"key": "pageNumber",
+									"value": "0"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Endpoint de filtrado avanzado. Permite combinar múltiples filtros como categorías, colores, tallas, precios mínimos y máximos, descuentos y paginación."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Productos - Admin",
+			"item": [
+				{
+					"name": "Crear un Producto",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 202 Accepted\", function () {",
+									"    pm.response.to.have.status(202);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set(\"createdProductId\", jsonData.id);",
+									"    pm.test(\"ID del producto creado almacenado en variable createdProductId\", function() {",
+									"        pm.expect(jsonData.id).to.be.a('number');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Camiseta Postman Test\",\n  \"description\": \"Producto creado automáticamente desde una prueba de integración de Postman.\",\n  \"price\": 30000,\n  \"discountedPrice\": 24000,\n  \"discountPersent\": 20,\n  \"quantity\": 40,\n  \"brand\": \"PostmanBrand\",\n  \"color\": \"Rojo\",\n  \"sizes\": [\n    {\n      \"name\": \"M\",\n      \"quantity\": 20\n    },\n    {\n      \"name\": \"L\",\n      \"quantity\": 20\n    }\n  ],\n  \"imageUrl\": \"https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500\",\n  \"topLevelCategory\": \"Hombre\",\n  \"secondLevelCategory\": \"Ropa\",\n  \"thirdLevelCategory\": \"Camisetas\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/products/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"products",
+								""
+							]
+						},
+						"description": "Crea un producto nuevo. Requiere autenticación de administrador mediante el JWT almacenado en `{{jwtToken}}`."
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar un Producto",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"El producto se actualizó con el nuevo título y precio\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.title).to.eql(\"Camiseta Postman Test Modificada\");",
+									"    pm.expect(jsonData.price).to.eql(35000);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Camiseta Postman Test Modificada\",\n  \"description\": \"Descripción modificada en pruebas.\",\n  \"price\": 35000,\n  \"discountedPrice\": 28000,\n  \"discountPersent\": 20,\n  \"quantity\": 50\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/products/{{createdProductId}}/update",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"products",
+								"{{createdProductId}}",
+								"update"
+							]
+						},
+						"description": "Actualiza la información de un producto existente. Usa la variable `{{createdProductId}}` que se guardó al crear el producto."
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar un Producto",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 202 Accepted\", function () {",
+									"    pm.response.to.have.status(202);",
+									"});",
+									"",
+									"pm.test(\"La respuesta confirma la eliminación exitosa\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(true);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/products/{{createdProductId}}/delete",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"products",
+								"{{createdProductId}}",
+								"delete"
+							]
+						},
+						"description": "Elimina el producto de prueba creado para mantener limpia la base de datos."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "jwtToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "createdProductId",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

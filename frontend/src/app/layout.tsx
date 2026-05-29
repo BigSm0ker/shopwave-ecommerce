@@ -5,6 +5,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 
 import { AuthProvider } from "@/context/AuthContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 
 import "./globals.css";
 
@@ -31,23 +32,25 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
     >
-      <body className="min-h-full flex flex-col bg-[radial-gradient(circle_at_top,_rgba(34,211,238,0.18),_transparent_34%),linear-gradient(180deg,_#07111f_0%,_#0f172a_100%)] text-slate-100 bg-fixed bg-no-repeat">
+      <body className="min-h-full flex flex-col bg-fixed bg-no-repeat">
 
-        <AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
 
-          <Navbar />
+            <Navbar />
 
-          <main className="flex-1">
-            {children}
-          </main>
+            <main className="flex-1">
+              {children}
+            </main>
 
-          <Footer />
+            <Footer />
 
-        </AuthProvider>
+          </AuthProvider>
+        </ThemeProvider>
 
       </body>
     </html>
   );
-}
+}

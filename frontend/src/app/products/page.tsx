@@ -22,24 +22,24 @@ export default async function ProductsPage() {
     <PageLayout>
       <div className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-cyan-400">
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-primary">
             Catálogo
           </p>
-          <h1 className="text-3xl font-black text-white mt-1">Nuestros productos</h1>
+          <h1 className="text-3xl font-black text-foreground-bright mt-1">Nuestros productos</h1>
         </div>
-        <p className="max-w-md text-sm text-slate-400">
+        <p className="max-w-md text-sm text-foreground-muted">
           Lista consumida directamente desde la API para validar el flujo completo.
         </p>
       </div>
 
       {errorMsg ? (
-        <div className="rounded-3xl border border-rose-500/20 bg-rose-500/5 p-8 text-rose-300 backdrop-blur-sm shadow-xl">
+        <div className="rounded-3xl border border-rose-500/20 bg-rose-500/5 p-8 text-rose-accent backdrop-blur-sm shadow-xl">
           <p className="font-semibold">{errorMsg}</p>
-          <p className="text-xs text-rose-400/80 mt-1">Por favor verifica que el backend Spring Boot esté en ejecución.</p>
+          <p className="text-xs mt-1 opacity-80">Por favor verifica que el backend Spring Boot esté en ejecución.</p>
         </div>
       ) : products.length === 0 ? (
-        <div className="rounded-3xl border border-white/10 bg-slate-900/60 p-8 text-slate-400 backdrop-blur-sm shadow-xl">
-          <p className="font-semibold text-white">No hay productos disponibles</p>
+        <div className="rounded-3xl border border-border bg-surface/60 p-8 text-foreground-muted backdrop-blur-sm shadow-xl">
+          <p className="font-semibold text-foreground-bright">No hay productos disponibles</p>
           <p className="text-sm mt-1">Actualmente no se registran productos en el catálogo.</p>
         </div>
       ) : (

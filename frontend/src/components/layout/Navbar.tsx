@@ -1,14 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, ShoppingCart, X, LogOut, UserCircle2 } from "lucide-react";
+import { Menu, ShoppingCart, X, LogOut, UserCircle2, Sun, Moon } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function Navbar() {
   const pathname = usePathname();
   const { isAuthenticated, user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -24,7 +26,7 @@ export default function Navbar() {
       transition-all
       duration-200
       hover:scale-[1.02]
-      ${isActive ? "text-cyan-400 font-semibold" : "text-slate-300 hover:text-cyan-300"}
+      ${isActive ? "text-primary font-semibold" : "text-foreground-muted hover:text-primary"}
     `;
   };
 
@@ -37,10 +39,10 @@ export default function Navbar() {
         w-full
         h-16
         border-b
-        border-white/10
-        bg-slate-950/75
+        border-border
+        bg-surface/75
         backdrop-blur-md
-        text-white
+        text-foreground
         shadow-lg
         flex
         items-center
@@ -55,8 +57,8 @@ export default function Navbar() {
             font-black
             tracking-wider
             bg-gradient-to-r
-            from-cyan-400
-            to-teal-300
+            from-[var(--logo-from)]
+            to-[var(--logo-to)]
             bg-clip-text
             text-transparent
             hover:opacity-90
@@ -69,7 +71,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-6">
           <Link href="/" className={linkClass("/")}>
             Inicio
           </Link>
@@ -85,15 +87,15 @@ export default function Navbar() {
             </Link>
           )}
 
-          <div className="h-4 w-[1px] bg-white/10"></div>
+          <div className="h-4 w-[1px] bg-border"></div>
 
           {isAuthenticated ? (
             <div className="flex items-center gap-4">
               <Link 
                 href="/profile" 
-                className="text-sm font-semibold text-slate-200 hover:text-cyan-300 flex items-center gap-1.5 transition duration-200"
+                className="text-sm font-semibold text-foreground-muted hover:text-primary flex items-center gap-1.5 transition duration-200"
               >
-                <UserCircle2 size={16} className="text-cyan-400" />
+                <UserCircle2 size={16} className="text-primary" />
                 {user ? user.firstName : "Perfil"}
               </Link>
               <button
@@ -111,12 +113,13 @@ export default function Navbar() {
                   py-1.5
                   text-xs
                   font-bold
-                  text-rose-300
+                  text-rose-accent
                   transition-all
                   duration-200
                   hover:bg-rose-500/10
                   hover:border-rose-500/30
                   active:scale-[0.98]
+                  cursor-pointer
                 "
               >
                 <LogOut size={12} />
@@ -131,15 +134,15 @@ export default function Navbar() {
                 items-center
                 justify-center
                 rounded-xl
-                bg-cyan-400
+                bg-primary
                 px-4
                 py-2
                 text-xs
                 font-bold
-                text-slate-950
+                text-btn-primary-text
                 transition-all
                 duration-200
-                hover:bg-cyan-300
+                hover:opacity-90
                 hover:scale-[1.02]
                 active:scale-[0.98]
               "
@@ -148,14 +151,45 @@ export default function Navbar() {
             </Link>
           )}
 
-          <Link href="/cart" className="relative text-slate-300 hover:text-cyan-300 transition duration-200">
+          <div className="h-4 w-[1px] bg-border"></div>
+
+          <Link href="/cart" className="relative text-foreground-muted hover:text-primary transition duration-200">
             <ShoppingCart size={18} />
           </Link>
+
+          {/* Theme switcher */}
+          <button
+            onClick={toggleTheme}
+            className="
+              relative
+              p-2
+              rounded-xl
+              border
+              border-border
+              bg-surface-alt/50
+              text-foreground-muted
+              hover:text-primary
+              hover:border-primary/30
+              transition-all
+              duration-200
+              active:scale-[0.95]
+              cursor-pointer
+            "
+            aria-label="Cambiar tema"
+          >
+            <div className="relative w-4 h-4 flex items-center justify-center">
+              {theme === "dark" ? (
+                <Sun size={16} className="transition-transform duration-500 rotate-0 scale-100 text-[var(--yellow-accent)]" />
+              ) : (
+                <Moon size={16} className="transition-transform duration-500 rotate-360 scale-100 text-cyan-600" />
+              )}
+            </div>
+          </button>
         </div>
 
         {/* Mobile menu trigger */}
         <button
-          className="md:hidden text-slate-300 hover:text-white transition"
+          className="md:hidden text-foreground-muted hover:text-foreground transition cursor-pointer"
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Toggle menu"
         >
@@ -165,7 +199,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="absolute top-16 left-0 w-full md:hidden flex flex-col gap-4 px-6 pb-6 bg-slate-950/95 border-b border-white/10 pt-4 shadow-xl backdrop-blur-lg">
+        <div className="absolute top-16 left-0 w-full md:hidden flex flex-col gap-4 px-6 pb-6 bg-surface/95 border-b border-border pt-4 shadow-xl backdrop-blur-lg">
           <Link href="/" className={linkClass("/")}>Inicio</Link>
           <Link href="/products" className={linkClass("/products")}>Productos</Link>
           <Link href="/cart" className={linkClass("/cart")}>Carrito</Link>
@@ -173,12 +207,44 @@ export default function Navbar() {
             <Link href="/admin" className={linkClass("/admin")}>Admin</Link>
           )}
           
-          <div className="h-[1px] w-full bg-white/5 my-1"></div>
+          <div className="h-[1px] w-full bg-border my-1"></div>
+
+          {/* Theme switcher for mobile */}
+          <div className="flex items-center justify-between text-sm font-semibold text-foreground-muted py-1">
+            <span>Tema: {theme === "dark" ? "Oscuro" : "Claro"}</span>
+            <button
+              onClick={toggleTheme}
+              className="
+                relative
+                p-2
+                rounded-xl
+                border
+                border-border
+                bg-surface-alt/50
+                text-foreground-muted
+                hover:text-primary
+                hover:border-primary/30
+                transition-all
+                duration-200
+                active:scale-[0.95]
+                cursor-pointer
+              "
+              aria-label="Cambiar tema"
+            >
+              {theme === "dark" ? (
+                <Sun size={16} className="text-[var(--yellow-accent)]" />
+              ) : (
+                <Moon size={16} className="text-cyan-600" />
+              )}
+            </button>
+          </div>
+
+          <div className="h-[1px] w-full bg-border my-1"></div>
 
           {isAuthenticated ? (
             <div className="flex flex-col gap-4">
-              <Link href="/profile" className="text-sm font-semibold text-slate-200 flex items-center gap-1.5">
-                <UserCircle2 size={18} className="text-cyan-400" />
+              <Link href="/profile" className="text-sm font-semibold text-foreground flex items-center gap-1.5">
+                <UserCircle2 size={18} className="text-primary" />
                 {user ? user.firstName : "Perfil"}
               </Link>
               <button
@@ -197,9 +263,10 @@ export default function Navbar() {
                   py-2
                   text-sm
                   font-bold
-                  text-rose-300
+                  text-rose-accent
                   transition
                   hover:bg-rose-500/10
+                  cursor-pointer
                 "
               >
                 <LogOut size={14} />
@@ -215,13 +282,13 @@ export default function Navbar() {
                 items-center
                 justify-center
                 rounded-xl
-                bg-cyan-400
+                bg-primary
                 py-2.5
                 text-sm
                 font-bold
-                text-slate-950
+                text-btn-primary-text
                 transition
-                hover:bg-cyan-300
+                hover:opacity-90
               "
             >
               Iniciar sesión

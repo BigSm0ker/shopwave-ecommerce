@@ -1,4 +1,4 @@
-﻿import type { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 interface AuthPageShellProps {
   eyebrow: string;
@@ -20,9 +20,9 @@ export function AuthPageShell({
   children,
 }: AuthPageShellProps) {
   return (
-    <main className="min-h-screen bg-slate-950 px-4 py-10 text-slate-100 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-transparent px-4 py-10 text-foreground sm:px-6 lg:px-8">
       <section className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-6xl items-center justify-center">
-        <div className="grid w-full overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl shadow-black/30 backdrop-blur lg:grid-cols-2">
+        <div className="grid w-full overflow-hidden rounded-3xl border border-border bg-surface/50 shadow-[0_25px_50px_var(--shadow-color)] backdrop-blur lg:grid-cols-2">
           <aside className="hidden bg-gradient-to-br from-cyan-500 via-blue-600 to-indigo-600 p-10 lg:flex lg:flex-col lg:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.3em] text-white/80">
@@ -43,13 +43,13 @@ export function AuthPageShell({
 
           <section className="p-6 sm:p-10">
             <div className="mx-auto max-w-md">
-              <p className="text-sm font-semibold uppercase tracking-[0.25em] text-cyan-300">
+              <p className="text-sm font-semibold uppercase tracking-[0.25em] text-primary">
                 {eyebrow}
               </p>
 
-              <h2 className="mt-4 text-3xl font-bold text-white">{title}</h2>
+              <h2 className="mt-4 text-3xl font-bold text-foreground-bright">{title}</h2>
 
-              <p className="mt-3 text-sm leading-6 text-slate-300">
+              <p className="mt-3 text-sm leading-6 text-foreground-muted">
                 {description}
               </p>
 

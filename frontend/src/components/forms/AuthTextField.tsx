@@ -1,4 +1,4 @@
-﻿import type { HTMLInputTypeAttribute } from "react";
+import type { HTMLInputTypeAttribute } from "react";
 
 interface AuthTextFieldProps {
   id: string;
@@ -29,7 +29,7 @@ export function AuthTextField({
 
   return (
     <div>
-      <label htmlFor={id} className="block text-sm font-medium text-slate-200">
+      <label htmlFor={id} className="block text-sm font-medium text-foreground-muted">
         {label}
       </label>
 
@@ -44,15 +44,15 @@ export function AuthTextField({
         disabled={disabled}
         aria-invalid={Boolean(error)}
         aria-describedby={error ? errorId : undefined}
-        className={`mt-2 w-full rounded-xl border bg-white/10 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-400 disabled:cursor-not-allowed disabled:opacity-70 ${
+        className={`mt-2 w-full rounded-xl border bg-surface-alt/50 px-4 py-3 text-sm text-foreground outline-none transition placeholder:text-foreground-muted/60 disabled:cursor-not-allowed disabled:opacity-70 ${
           error
-            ? "border-red-400 focus:border-red-300 focus:ring-2 focus:ring-red-300/30"
-            : "border-white/10 focus:border-cyan-300 focus:ring-2 focus:ring-cyan-300/30"
+            ? "border-red-500 focus:border-red-400 focus:ring-2 focus:ring-red-500/30"
+            : "border-border focus:border-primary focus:ring-2 focus:ring-primary/30"
         }`}
       />
 
       {error && (
-        <p id={errorId} className="mt-2 text-sm text-red-200">
+        <p id={errorId} className="mt-2 text-sm text-rose-accent">
           {error}
         </p>
       )}

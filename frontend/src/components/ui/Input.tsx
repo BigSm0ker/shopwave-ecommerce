@@ -32,21 +32,21 @@ export default function Input({
     w-full
     rounded-xl
     border
-    bg-white/10
+    bg-surface-alt/50
     px-4
     py-3
     text-sm
-    text-white
+    text-foreground
     outline-none
     transition-all
     duration-200
-    placeholder:text-slate-400
+    placeholder:text-foreground-muted/60
     disabled:cursor-not-allowed
     disabled:opacity-70
     ${
       isError
         ? "border-rose-400/40 focus:border-rose-400 focus:ring-2 focus:ring-rose-400/20"
-        : "border-white/10 focus:border-cyan-300 focus:ring-2 focus:ring-cyan-300/30"
+        : "border-border focus:border-primary focus:ring-2 focus:ring-primary/30"
     }
     ${className}
   `;
@@ -54,7 +54,7 @@ export default function Input({
   return (
     <div className="flex flex-col gap-2 w-full">
       {label && (
-        <label htmlFor={inputId} className="block text-sm font-medium text-slate-200">
+        <label htmlFor={inputId} className="block text-sm font-medium text-foreground-muted">
           {label}
         </label>
       )}
@@ -84,7 +84,7 @@ export default function Input({
       )}
 
       {error && (
-        <span className="text-xs font-medium text-rose-400 mt-1">
+        <span className="text-xs font-medium text-rose-accent mt-1">
           {error}
         </span>
       )}
