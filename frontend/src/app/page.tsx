@@ -13,8 +13,8 @@ export default async function Home() {
   try {
     const products = await productService.getProducts();
     if (products && products.length > 0) {
-      featuredProducts = products.slice(0, 4);
-    }
+      featuredProducts = products.slice(0, 10);
+      }
   } catch (error) {
     console.error("Error fetching products on Home page:", error);
     errorMsg = "No se pudieron cargar los productos desde la base de datos.";
@@ -111,20 +111,37 @@ export default async function Home() {
             <p className="text-sm mt-1">No se encontraron productos disponibles en este momento.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {featuredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                id={product.id}
-                title={product.title}
-                price={product.price}
-                discountedPrice={product.discountedPrice}
-                discountPersent={product.discountPersent}
-                image={product.imageUrl}
-                description={product.description}
-              />
-            ))}
-          </div>
+
+          <div
+  className="
+    flex
+    gap-6
+    overflow-x-auto
+    pb-4
+    scroll-smooth
+  "
+>
+  {featuredProducts.map((product) => (
+    <div
+      key={product.id}
+      className="
+        min-w-[280px]
+        max-w-[280px]
+        flex-shrink-0
+      "
+    >
+      <ProductCard
+        id={product.id}
+        title={product.title}
+        price={product.price}
+        discountedPrice={product.discountedPrice}
+        discountPersent={product.discountPersent}
+        image={product.imageUrl}
+        description={product.description}
+      />
+    </div>
+  ))}
+</div>
         )}
       </section>
 
