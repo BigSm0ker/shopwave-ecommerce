@@ -1,10 +1,10 @@
 ﻿// src/app/products/page.tsx
 import Link from 'next/link';
-// Importamos el servicio real que hizo tu compañero
+
 import { productService } from '@/services/product.service'; 
 
 export default async function ProductsPage() {
-  // Llamamos al backend real
+
   const products = await productService.getProducts();
 
   return (

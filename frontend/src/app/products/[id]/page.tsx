@@ -9,10 +9,9 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   let product;
 
   try {
-    // Usamos el servicio de tu compañero para buscar por ID
     product = await productService.getProductById(productId);
   } catch (error) {
-    // Si el backend responde con un error (ej. 404 Not Found), disparamos notFound()
+   
     notFound();
   }
 
