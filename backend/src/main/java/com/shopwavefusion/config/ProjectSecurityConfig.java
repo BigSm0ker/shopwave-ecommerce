@@ -35,7 +35,7 @@ public class ProjectSecurityConfig {
 				.addFilterBefore(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class)
 				.authorizeHttpRequests((requests) -> requests
 						.requestMatchers("/admin/products/**", "/admin/orders/**", "/admin/control/**").hasRole("ADMIN")
-						.requestMatchers("/cart/**", "/users/**", "cart_items/**", "/orders/**", 
+						.requestMatchers("/cart/**", "/users/**", "/cart_items/**", "/orders/**", 
 								"/ratings/**")
 						.hasAnyRole("USER", "ADMIN").requestMatchers("/all").hasAnyRole("USER", "ADMIN")
 						.requestMatchers("/auth/signin").authenticated()

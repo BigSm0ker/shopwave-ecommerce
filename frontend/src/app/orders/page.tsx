@@ -1,12 +1,13 @@
 import { AuthGuard } from "@/guards/AuthGuard";
+import PageLayout from "@/components/layout/PageLayout";
 
 export default function OrdersPage() {
   return (
     <AuthGuard>
-      <main className="p-6">
-        <h1 className="text-2xl font-bold">Mis pedidos</h1>
-        <p className="mt-2 text-gray-600">Página en construcción.</p>
-      </main>
+      <PageLayout>
+        <h1 className="text-2xl font-black text-slate-950">Mis pedidos</h1>
+        <p className="mt-2 text-slate-600">Página protegida para consultar el historial del usuario.</p>
+      </PageLayout>
     </AuthGuard>
   );
 }

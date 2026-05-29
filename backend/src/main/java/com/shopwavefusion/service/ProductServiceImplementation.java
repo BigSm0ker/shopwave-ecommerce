@@ -64,7 +64,6 @@ public class ProductServiceImplementation implements ProductService {
 	public Product createProduct(CreateProductRequest req) throws SQLException {
 		System.out.println("reached here");
 		Category topLevel=categoryRepository.findByName(req.getTopLevelCategory());
-		
 		if(topLevel==null) {
 			
 			Category topLavelCategory=new Category();
@@ -139,15 +138,37 @@ public class ProductServiceImplementation implements ProductService {
 	public Product updateProduct(Long productId,Product req) throws ProductException {
 		Product product=findProductById(productId);
 		
-		if(req.getQuantity()!=0) {
-			product.setQuantity(req.getQuantity());
+		if(req.getTitle()!=null) {
+			product.setTitle(req.getTitle());
 		}
 		if(req.getDescription()!=null) {
 			product.setDescription(req.getDescription());
 		}
+		if(req.getPrice()!=0) {
+			product.setPrice(req.getPrice());
+		}
+		if(req.getDiscountedPrice()!=0) {
+			product.setDiscountedPrice(req.getDiscountedPrice());
+		}
+		if(req.getDiscountPersent()!=0) {
+			product.setDiscountPersent(req.getDiscountPersent());
+		}
+		if(req.getQuantity()!=0) {
+			product.setQuantity(req.getQuantity());
+		}
+		if(req.getBrand()!=null) {
+			product.setBrand(req.getBrand());
+		}
+		if(req.getColor()!=null) {
+			product.setColor(req.getColor());
+		}
+		if(req.getImageUrl()!=null) {
+			product.setImageUrl(req.getImageUrl());
+		}
+		if(req.getSizes()!=null && !req.getSizes().isEmpty()) {
+			product.setSizes(req.getSizes());
+		}
 		
-		
-			
 		
 		return productRepository.save(product);
 	}

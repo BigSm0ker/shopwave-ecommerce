@@ -48,7 +48,7 @@ export const productService = {
     const params = new URLSearchParams({ q: query });
 
     return apiService.get<Product[]>(
-      `/products/products/search?${params.toString()}`,
+      `/products/search?${params.toString()}`,
       { auth: false }
     );
   },
