@@ -12,6 +12,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Lob;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -56,7 +57,8 @@ public class Product {
     @Column(name = "sizes")
     private Set<Size> sizes=new HashSet<>();
 
-    @Column(name = "image_url")
+	@Lob
+	@Column(name = "image_url", columnDefinition = "LONGTEXT")
     private String imageUrl;
 
     @OneToMany(mappedBy = "product",cascade = CascadeType.ALL,orphanRemoval = true)

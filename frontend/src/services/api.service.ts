@@ -71,6 +71,7 @@ export const apiService = {
     const response = await fetch(`${API_URL}${endpoint}`, {
       method: options.method ?? "GET",
       headers: buildHeaders(options),
+      cache: (options.method ?? "GET") === "GET" ? "no-store" : "default",
       body: options.body ? JSON.stringify(options.body) : undefined,
     });
 
