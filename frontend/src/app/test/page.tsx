@@ -23,21 +23,21 @@ export default function TestPage() {
         <h1
           className="
             text-4xl
-            font-bold
-            text-[var(--primary)]
+            font-extrabold
+            text-cyan-400
           "
         >
           ShopWave UI System
         </h1>
 
-        <p className="mt-2 text-gray-600">
+        <p className="mt-2 text-slate-300">
           Componentes reutilizables del ecommerce.
         </p>
       </section>
 
       {/* Product cards */}
       <section className="mb-16">
-        <h2 className="text-2xl font-semibold mb-6">
+        <h2 className="text-2xl font-bold text-white mb-6">
           Product Cards
         </h2>
 
@@ -75,7 +75,7 @@ export default function TestPage() {
 
       {/* Skeletons */}
       <section className="mb-16">
-        <h2 className="text-2xl font-semibold mb-6">
+        <h2 className="text-2xl font-bold text-white mb-6">
           Skeleton Loading
         </h2>
 
@@ -96,7 +96,7 @@ export default function TestPage() {
 
       {/* Alerts */}
       <section className="mb-16">
-        <h2 className="text-2xl font-semibold mb-6">
+        <h2 className="text-2xl font-bold text-white mb-6">
           Alerts
         </h2>
 
@@ -115,7 +115,7 @@ export default function TestPage() {
 
       {/* Spinner */}
       <section className="mb-16">
-        <h2 className="text-2xl font-semibold mb-6">
+        <h2 className="text-2xl font-bold text-white mb-6">
           Loading Spinner
         </h2>
 
@@ -124,7 +124,7 @@ export default function TestPage() {
 
       {/* Modal */}
       <section className="mb-16">
-        <h2 className="text-2xl font-semibold mb-6">
+        <h2 className="text-2xl font-bold text-white mb-6">
           Modal
         </h2>
 
@@ -137,7 +137,7 @@ export default function TestPage() {
           onClose={() => setOpen(false)}
           title="Producto agregado"
         >
-          <p className="text-gray-600">
+          <p className="text-slate-300">
             El producto se agregó correctamente al carrito.
           </p>
         </Modal>
@@ -145,16 +145,18 @@ export default function TestPage() {
 
       {/* Empty state */}
       <section className="mb-16">
-        <h2 className="text-2xl font-semibold mb-6">
+        <h2 className="text-2xl font-bold text-white mb-6">
           Empty State
         </h2>
 
         <div
           className="
-            bg-[var(--surface)]
-            rounded-2xl
+            bg-slate-900/60
+            rounded-3xl
             border
-            border-[var(--border)]
+            border-white/10
+            shadow-xl
+            backdrop-blur-sm
           "
         >
           <EmptyState
