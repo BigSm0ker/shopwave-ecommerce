@@ -10,7 +10,7 @@ export default function Skeleton({
       className={`
         animate-pulse
         rounded-md
-        bg-gray-200
+        bg-white/5
         ${className}
       `}
     />

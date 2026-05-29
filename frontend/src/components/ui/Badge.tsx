@@ -9,13 +9,17 @@ export default function Badge({
     <span
       className="
         inline-block
-        px-3
+        px-2.5
         py-1
-        text-sm
-        font-medium
+        text-xs
+        font-semibold
+        tracking-wider
+        uppercase
         rounded-full
-        bg-[var(--secondary)]
-        text-white
+        bg-cyan-500/10
+        border
+        border-cyan-400/20
+        text-cyan-300
         shadow-sm
       "
     >

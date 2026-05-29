@@ -10,14 +10,16 @@ export default function Alert({
   return (
     <div
       className={`
-        p-4
-        rounded-lg
-        text-white
+        px-4
+        py-3
+        rounded-xl
+        text-sm
         font-medium
+        border
         ${
           type === "success"
-            ? "bg-green-500"
-            : "bg-red-500"
+            ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-200"
+            : "border-red-400/30 bg-red-500/10 text-red-200"
         }
       `}
     >

@@ -20,7 +20,8 @@ export default function Modal({
       className="
         fixed
         inset-0
-        bg-black/50
+        bg-slate-950/80
+        backdrop-blur-sm
         flex
         items-center
         justify-center
@@ -30,28 +31,33 @@ export default function Modal({
     >
       <div
         className="
-          bg-white
-          rounded-2xl
+          bg-slate-900/95
+          border
+          border-white/10
+          rounded-3xl
           w-full
           max-w-lg
           p-6
-          shadow-xl
+          shadow-2xl
+          text-slate-100
         "
       >
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">
+          <h2 className="text-2xl font-bold text-white">
             {title}
           </h2>
 
           <button
             onClick={onClose}
-            className="text-xl"
+            className="text-slate-400 hover:text-white transition-colors text-xl"
           >
             ✕
           </button>
         </div>
 
-        {children}
+        <div className="text-slate-300">
+          {children}
+        </div>
       </div>
     </div>
   )

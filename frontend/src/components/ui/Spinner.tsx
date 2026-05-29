@@ -5,8 +5,8 @@ export default function Spinner() {
         w-8
         h-8
         border-4
-        border-gray-300
-        border-t-[var(--secondary)]
+        border-white/10
+        border-t-cyan-400
         rounded-full
         animate-spin
       "
