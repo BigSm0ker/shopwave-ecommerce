@@ -5,7 +5,9 @@ export default function ProductCardSkeleton() {
     <div
       className="
         border
-        rounded-xl
+        border-white/10
+        bg-slate-900/60
+        rounded-3xl
         overflow-hidden
         p-4
         flex
