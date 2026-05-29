@@ -174,7 +174,7 @@ export default function RegisterPage() {
       description="Completa tus datos para registrarte en la tienda."
       sideTitle="Crea tu cuenta y empieza a comprar mejor."
       sideDescription="Regístrate para acceder al catálogo, carrito, pedidos y perfil de usuario."
-      sideNote="Formulario preparado para conectarse con /auth/signup del backend."
+      sideNote=""
     >
       <form className="mt-8 space-y-5" onSubmit={handleSubmit} noValidate>
         <div className="grid gap-5 sm:grid-cols-2">

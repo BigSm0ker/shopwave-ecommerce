@@ -119,7 +119,7 @@ export default function LoginPage() {
       description="Usa tu correo y contraseña para continuar."
       sideTitle="Bienvenido de nuevo a tu tienda online."
       sideDescription="Accede a tu cuenta para revisar productos, carrito, pedidos y beneficios exclusivos."
-      sideNote="Interfaz preparada para integrarse con JWT y el backend Spring Boot."
+      sideNote=""
     >
       <form className="mt-8 space-y-5" onSubmit={handleSubmit} noValidate>
         <AuthTextField
