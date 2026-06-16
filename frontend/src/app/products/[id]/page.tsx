@@ -2,7 +2,7 @@ import PageLayout from "@/components/layout/PageLayout";
 import { productService } from "@/services/product.service";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Button from "@/components/ui/Button";
+import ProductActions from "./ProductActions";
 
 export const dynamic = "force-dynamic";
 
@@ -80,12 +80,13 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             </div>
           </div>
 
-          {/* Add to Cart button */}
-          <div className="pt-6">
-            <Button className="w-full md:w-auto px-8 py-3">
-              Añadir al Carrito
-            </Button>
-          </div>
+          <ProductActions
+            productId={product.id}
+            price={product.price}
+            discountedPrice={product.discountedPrice}
+            sizes={product.sizes}
+            stockQuantity={product.quantity}
+          />
         </div>
       </div>
     </PageLayout>
