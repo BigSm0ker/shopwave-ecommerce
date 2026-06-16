@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { cartService } from "@/services/cart.service";
 import type { Size } from "@/models/product.model";
 import Button from "@/components/ui/Button";
 import Alert from "@/components/ui/Alert";
 import { useAuth } from "@/hooks/useAuth";
+import { useCart } from "@/hooks/useCart";
 
 interface ProductActionsProps {
   productId: number;
@@ -23,6 +23,7 @@ export default function ProductActions({
   stockQuantity,
 }: ProductActionsProps) {
   const { isAuthenticated } = useAuth();
+  const { addToCart, isMutating } = useCart();
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +49,7 @@ export default function ProductActions({
 
     try {
       setIsSubmitting(true);
-      await cartService.addItem({
+      await addToCart({
         productId,
         size: selectedSize || "Única",
         quantity: 1,
@@ -120,7 +121,7 @@ export default function ProductActions({
       <div className="pt-2">
         <Button
           onClick={handleAddToCart}
-          disabled={isOutOfStock || isSubmitting}
+          disabled={isOutOfStock || isSubmitting || isMutating}
           isLoading={isSubmitting}
           className="w-full md:w-auto px-8 py-3"
         >

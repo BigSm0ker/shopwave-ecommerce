@@ -5,10 +5,12 @@ import { Menu, ShoppingCart, X, LogOut, UserCircle2 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useCart } from "@/hooks/useCart";
 
 export default function Navbar() {
   const pathname = usePathname();
   const { isAuthenticated, user, logout } = useAuth();
+  const { itemCount } = useCart();
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -150,6 +152,11 @@ export default function Navbar() {
 
           <Link href="/cart" className="relative text-slate-300 hover:text-cyan-300 transition duration-200">
             <ShoppingCart size={18} />
+            {isAuthenticated && itemCount > 0 && (
+              <span className="absolute -right-2.5 -top-2.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-cyan-400 px-1 text-[10px] font-black text-slate-950">
+                {itemCount}
+              </span>
+            )}
           </Link>
         </div>
 
