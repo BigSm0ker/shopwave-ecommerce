@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { productService } from "@/services/product.service";
-import ProductCard from "@/components/ui/ProductCard";
+import ProductCarousel from "@/components/products/ProductCarousel";
 import { Leaf, Truck, Package, ArrowRight, ShieldCheck, HelpCircle } from "lucide-react";
 import type { Product } from "@/models/product.model";
 
@@ -111,36 +111,7 @@ export default async function Home() {
           </div>
         ) : (
 
-          <div
-  className="
-    flex
-    gap-6
-    overflow-x-auto
-    pb-4
-    scroll-smooth
-  "
->
-  {featuredProducts.map((product) => (
-    <div
-      key={product.id}
-      className="
-        min-w-[280px]
-        max-w-[280px]
-        flex-shrink-0
-      "
-    >
-      <ProductCard
-        id={product.id}
-        title={product.title}
-        price={product.price}
-        discountedPrice={product.discountedPrice}
-        discountPersent={product.discountPersent}
-        image={product.imageUrl}
-        description={product.description}
-      />
-    </div>
-  ))}
-</div>
+          <ProductCarousel products={featuredProducts} />
         )}
       </section>
 
