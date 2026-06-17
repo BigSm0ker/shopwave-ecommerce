@@ -13,4 +13,28 @@ export const orderService = {
   getOrderById(orderId: number | string): Promise<Order> {
     return apiService.get<Order>(`/orders/${orderId}`);
   },
+
+  adminGetAllOrders(): Promise<Order[]> {
+    return apiService.get<Order[]>("/admin/orders/");
+  },
+
+  adminConfirmOrder(orderId: number | string): Promise<Order> {
+    return apiService.put<Order>(`/admin/orders/${orderId}/confirmed`);
+  },
+
+  adminShipOrder(orderId: number | string): Promise<Order> {
+    return apiService.put<Order>(`/admin/orders/${orderId}/ship`);
+  },
+
+  adminDeliverOrder(orderId: number | string): Promise<Order> {
+    return apiService.put<Order>(`/admin/orders/${orderId}/deliver`);
+  },
+
+  adminCancelOrder(orderId: number | string): Promise<Order> {
+    return apiService.put<Order>(`/admin/orders/${orderId}/cancel`);
+  },
+
+  adminDeleteOrder(orderId: number | string): Promise<{ message: string; status: boolean }> {
+    return apiService.delete<{ message: string; status: boolean }>(`/admin/orders/${orderId}/delete`);
+  },
 };
