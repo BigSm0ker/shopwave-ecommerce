@@ -111,7 +111,25 @@ export default function EditProductPage() {
   }, [productId]);
 
   const updateField = (field: keyof ProductFormState, value: string) => {
-    setForm((current) => ({ ...current, [field]: value }));
+    setForm((current) => {
+      // 1. Clonamos el estado actual con el nuevo valor
+      const updatedForm = { ...current, [field]: value };
+
+      // 2. Si se modificó el Precio o el Descuento, recalculamos automáticamente
+      if (field === "price" || field === "discountPersent") {
+        const priceNum = Number(updatedForm.price);
+        const discountNum = Number(updatedForm.discountPersent);
+
+        if (!Number.isNaN(priceNum) && !Number.isNaN(discountNum) && priceNum >= 0 && discountNum >= 0) {
+          const calculatedPrice = priceNum - (priceNum * (discountNum / 100));
+          updatedForm.discountedPrice = calculatedPrice.toFixed(2);
+        } else if (updatedForm.price === "") {
+          updatedForm.discountedPrice = "";
+        }
+      }
+
+      return updatedForm;
+    });
   };
 
   const handleImageFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -256,7 +274,7 @@ export default function EditProductPage() {
                   onChange={(e) => updateField("discountPersent", e.target.value)}
                 />
                 <Input
-                  label="Cantidad total"
+                  label="Cantidad total stock"
                   type="number"
                   min="0"
                   value={form.quantity}
