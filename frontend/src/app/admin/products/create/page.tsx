@@ -75,7 +75,27 @@ export default function AdminCreateProductPage() {
   const [success, setSuccess] = useState<string | null>(null);
 
   const updateField = (field: keyof ProductFormState, value: string) => {
-    setForm((current) => ({ ...current, [field]: value }));
+    setForm((current) => {
+      // 1. Clonamos el estado actual con el nuevo valor ingresado
+      const updatedForm = { ...current, [field]: value };
+
+      // 2. Si el usuario modificó el Precio o el Descuento, recalculamos el precio final automáticamente
+      if (field === "price" || field === "discountPersent") {
+        const priceNum = Number(updatedForm.price);
+        const discountNum = Number(updatedForm.discountPersent);
+
+        if (!Number.isNaN(priceNum) && !Number.isNaN(discountNum) && priceNum >= 0 && discountNum >= 0) {
+          const calculatedPrice = priceNum - (priceNum * (discountNum / 100));
+          // .toFixed(2) asegura que quede en formato moneda (ej. 475.00)
+          updatedForm.discountedPrice = calculatedPrice.toFixed(2);
+        } else if (updatedForm.price === "") {
+          updatedForm.discountedPrice = "";
+        }
+      }
+
+      // 3. Devolvemos el estado con todos los cambios listos
+      return updatedForm;
+    });
   };
 
   const handleImageFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -261,7 +281,7 @@ export default function AdminCreateProductPage() {
                 onChange={(e) => updateField("discountPersent", e.target.value)}
               />
               <Input
-                label="Cantidad total"
+                label="Cantidad total stock"
                 type="number"
                 min="0"
                 value={form.quantity}
