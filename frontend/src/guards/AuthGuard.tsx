@@ -38,3 +38,13 @@ export const AuthGuard: React.FC<{ children: React.ReactNode }> = ({
 
   return <>{children}</>;
 };
+
+export function withAuth<P extends object>(Component: React.ComponentType<P>) {
+  return function WithAuthComponent(props: P) {
+    return (
+      <AuthGuard>
+        <Component {...props} />
+      </AuthGuard>
+    );
+  };
+}

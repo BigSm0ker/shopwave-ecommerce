@@ -16,13 +16,21 @@ export default function AdminPage() {
             <p className="mt-2 text-slate-300">Acceso restringido para usuarios con rol ADMIN.</p>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-3">
             <Link
               href="/admin/products"
               className="group rounded-3xl border border-white/10 bg-slate-900/60 p-6 shadow-lg shadow-black/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-cyan-400/5 backdrop-blur-sm"
             >
               <h2 className="text-lg font-bold text-white group-hover:text-cyan-300 transition-colors">Productos</h2>
               <p className="mt-2 text-sm text-slate-300">Ver listado, crear, editar y eliminar productos.</p>
+            </Link>
+
+            <Link
+              href="/admin/orders"
+              className="group rounded-3xl border border-white/10 bg-slate-900/60 p-6 shadow-lg shadow-black/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-cyan-400/5 backdrop-blur-sm"
+            >
+              <h2 className="text-lg font-bold text-white group-hover:text-cyan-300 transition-colors">Órdenes / Ventas</h2>
+              <p className="mt-2 text-sm text-slate-300">Supervisar pedidos, realizar despachos y cambiar estados.</p>
             </Link>
 
             <Link
