@@ -1,6 +1,8 @@
 "use client";
 
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { AuthGuard } from "@/guards/AuthGuard";
 import PageLayout from "@/components/layout/PageLayout";
 import Alert from "@/components/ui/Alert";
@@ -40,6 +42,7 @@ const initialFormState: ProfileFormState = {
 
 function ProfileContent() {
   const { user } = useAuth();
+  const pathname = usePathname();
 
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
@@ -47,6 +50,7 @@ function ProfileContent() {
   const [success, setSuccess] = useState<boolean>(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors<ProfileField>>({});
   const [formData, setFormData] = useState<ProfileFormState>(initialFormState);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
 
   useEffect(() => {
     async function loadFullProfile() {
@@ -134,6 +138,7 @@ function ProfileContent() {
 
       await userService.updateProfile(updatedProfile);
       setSuccess(true);
+      setIsEditing(false);
     } catch (requestError) {
       setError(
         getErrorMessage(
@@ -225,257 +230,403 @@ function ProfileContent() {
           para tus compras.
         </p>
 
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-6 rounded-2xl border p-4 shadow-sm transition-all sm:p-6"
-          style={{
-            backgroundColor: "var(--surface)",
-            borderColor: "var(--border)",
-          }}
-        >
-          {error && <Alert message={error} type="error" />}
-
-          {success && (
-            <Alert
-              message="Tus cambios han sido guardados con éxito."
-              type="success"
-            />
-          )}
-
-          <div>
-            <h2
-              className="mb-4 border-b pb-1 text-lg font-bold"
-              style={{
-                color: "var(--foreground)",
-                borderColor: "var(--border)",
-              }}
-            >
-              Datos de Usuario
-            </h2>
-
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <label
-                  className="mb-1 block text-xs font-semibold"
-                  style={{ color: "var(--foreground)" }}
-                >
-                  Nombre
-                </label>
-
-                <input
-                  type="text"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  className={getInputClass("firstName")}
-                  style={inputStyle}
-                />
-
-                {fieldErrors.firstName && (
-                  <p className="mt-1 text-xs font-medium text-rose-400">
-                    {fieldErrors.firstName}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  className="mb-1 block text-xs font-semibold"
-                  style={{ color: "var(--foreground)" }}
-                >
-                  Apellido
-                </label>
-
-                <input
-                  type="text"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  className={getInputClass("lastName")}
-                  style={inputStyle}
-                />
-
-                {fieldErrors.lastName && (
-                  <p className="mt-1 text-xs font-medium text-rose-400">
-                    {fieldErrors.lastName}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  className="mb-1 block text-xs font-semibold"
-                  style={{ color: "var(--foreground)" }}
-                >
-                  Correo Electrónico
-                </label>
-
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  disabled
-                  className={getInputClass()}
-                  style={{
-                    ...inputStyle,
-                    opacity: 0.6,
-                  }}
-                />
-              </div>
-
-              <div>
-                <label
-                  className="mb-1 block text-xs font-semibold"
-                  style={{ color: "var(--foreground)" }}
-                >
-                  Teléfono Celular
-                </label>
-
-                <input
-                  type="text"
-                  name="mobile"
-                  value={formData.mobile}
-                  onChange={handleChange}
-                  className={getInputClass("mobile")}
-                  style={inputStyle}
-                />
-
-                {fieldErrors.mobile && (
-                  <p className="mt-1 text-xs font-medium text-rose-400">
-                    {fieldErrors.mobile}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h2
-              className="mb-4 border-b pb-1 text-lg font-bold"
-              style={{
-                color: "var(--foreground)",
-                borderColor: "var(--border)",
-              }}
-            >
-              Dirección de Entrega
-            </h2>
-
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="sm:col-span-2">
-                <label
-                  className="mb-1 block text-xs font-semibold"
-                  style={{ color: "var(--foreground)" }}
-                >
-                  Calle / Avenida y Número
-                </label>
-
-                <input
-                  type="text"
-                  name="streetAddress"
-                  value={formData.streetAddress}
-                  onChange={handleChange}
-                  className={getInputClass("streetAddress")}
-                  style={inputStyle}
-                  placeholder="Ej. Av. Siempre Viva 123"
-                />
-
-                {fieldErrors.streetAddress && (
-                  <p className="mt-1 text-xs font-medium text-rose-400">
-                    {fieldErrors.streetAddress}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  className="mb-1 block text-xs font-semibold"
-                  style={{ color: "var(--foreground)" }}
-                >
-                  Ciudad
-                </label>
-
-                <input
-                  type="text"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleChange}
-                  className={getInputClass("city")}
-                  style={inputStyle}
-                />
-
-                {fieldErrors.city && (
-                  <p className="mt-1 text-xs font-medium text-rose-400">
-                    {fieldErrors.city}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  className="mb-1 block text-xs font-semibold"
-                  style={{ color: "var(--foreground)" }}
-                >
-                  Estado / Departamento
-                </label>
-
-                <input
-                  type="text"
-                  name="state"
-                  value={formData.state}
-                  onChange={handleChange}
-                  className={getInputClass("state")}
-                  style={inputStyle}
-                />
-
-                {fieldErrors.state && (
-                  <p className="mt-1 text-xs font-medium text-rose-400">
-                    {fieldErrors.state}
-                  </p>
-                )}
-              </div>
-
-              <div className="sm:col-span-2 md:col-span-1">
-                <label
-                  className="mb-1 block text-xs font-semibold"
-                  style={{ color: "var(--foreground)" }}
-                >
-                  Código Postal
-                </label>
-
-                <input
-                  type="text"
-                  name="zipCode"
-                  value={formData.zipCode}
-                  onChange={handleChange}
-                  className={getInputClass("zipCode")}
-                  style={inputStyle}
-                />
-
-                {fieldErrors.zipCode && (
-                  <p className="mt-1 text-xs font-medium text-rose-400">
-                    {fieldErrors.zipCode}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div
-            className="flex flex-col gap-4 border-t pt-4 sm:flex-row sm:items-center sm:justify-between"
-            style={{ borderColor: "var(--border)" }}
+        {/* Pestañas de Navegación de Cuenta */}
+        <div className="flex gap-4 border-b border-white/10 pb-4 mb-6">
+          <Link
+            href="/profile"
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              pathname === "/profile"
+                ? "bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-400/10"
+                : "text-slate-300 hover:text-white hover:bg-white/5 border border-white/10"
+            }`}
           >
-            <span
-              className="w-fit rounded bg-slate-100 px-2.5 py-1 text-xs font-bold uppercase tracking-wider"
-              style={{ color: "var(--foreground)" }}
-            >
-              Rol: {user?.role ?? "USER"}
-            </span>
+            Mi Perfil
+          </Link>
+          <Link
+            href="/orders"
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              pathname === "/orders"
+                ? "bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-400/10"
+                : "text-slate-300 hover:text-white hover:bg-white/5 border border-white/10"
+            }`}
+          >
+            Mis Pedidos
+          </Link>
+        </div>
 
-            <Button type="submit" isLoading={saving} disabled={saving}>
-              Guardar ajustes
-            </Button>
+        {error && <Alert message={error} type="error" />}
+
+        {!isEditing ? (
+          <div
+            className="space-y-6 rounded-2xl border p-4 shadow-sm transition-all sm:p-6 animate-fade-in"
+            style={{
+              backgroundColor: "var(--surface)",
+              borderColor: "var(--border)",
+            }}
+          >
+            <div>
+              <h2
+                className="mb-4 border-b pb-1 text-lg font-bold text-white"
+                style={{
+                  borderColor: "var(--border)",
+                }}
+              >
+                Datos de Usuario
+              </h2>
+
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div className="space-y-1">
+                  <span className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                    Nombre Completo
+                  </span>
+                  <p className="text-sm font-medium text-slate-200">
+                    {formData.firstName} {formData.lastName}
+                  </p>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                    Correo Electrónico
+                  </span>
+                  <p className="text-sm font-medium text-slate-200">
+                    {formData.email}
+                  </p>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                    Teléfono Celular
+                  </span>
+                  <p className="text-sm font-medium text-slate-200">
+                    {formData.mobile || "No registrado"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h2
+                className="mb-4 border-b pb-1 text-lg font-bold text-white"
+                style={{
+                  borderColor: "var(--border)",
+                }}
+              >
+                Dirección de Entrega
+              </h2>
+
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div className="sm:col-span-2 space-y-1">
+                  <span className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                    Calle / Avenida y Número
+                  </span>
+                  <p className="text-sm font-medium text-slate-200">
+                    {formData.streetAddress || "No registrada"}
+                  </p>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                    Ciudad
+                  </span>
+                  <p className="text-sm font-medium text-slate-200">
+                    {formData.city || "No registrada"}
+                  </p>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                    Estado / Departamento
+                  </span>
+                  <p className="text-sm font-medium text-slate-200">
+                    {formData.state || "No registrado"}
+                  </p>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                    Código Postal
+                  </span>
+                  <p className="text-sm font-medium text-slate-200">
+                    {formData.zipCode || "No registrado"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div
+              className="flex flex-col gap-4 border-t pt-4 sm:flex-row sm:items-center sm:justify-between"
+              style={{ borderColor: "var(--border)" }}
+            >
+              <span className="w-fit rounded bg-white/5 border border-white/10 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-slate-300">
+                Rol: {user?.role ?? "USER"}
+              </span>
+
+              <Button type="button" onClick={() => setIsEditing(true)}>
+                Editar Perfil
+              </Button>
+            </div>
           </div>
-        </form>
+        ) : (
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-6 rounded-2xl border p-4 shadow-sm transition-all sm:p-6"
+            style={{
+              backgroundColor: "var(--surface)",
+              borderColor: "var(--border)",
+            }}
+          >
+            {success && (
+              <Alert
+                message="Tus cambios han sido guardados con éxito."
+                type="success"
+              />
+            )}
+
+            <div>
+              <h2
+                className="mb-4 border-b pb-1 text-lg font-bold"
+                style={{
+                  color: "var(--foreground)",
+                  borderColor: "var(--border)",
+                }}
+              >
+                Datos de Usuario
+              </h2>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label
+                    className="mb-1 block text-xs font-semibold"
+                    style={{ color: "var(--foreground)" }}
+                  >
+                    Nombre
+                  </label>
+
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    className={getInputClass("firstName")}
+                    style={inputStyle}
+                  />
+
+                  {fieldErrors.firstName && (
+                    <p className="mt-1 text-xs font-medium text-rose-400">
+                      {fieldErrors.firstName}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label
+                    className="mb-1 block text-xs font-semibold"
+                    style={{ color: "var(--foreground)" }}
+                  >
+                    Apellido
+                  </label>
+
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    className={getInputClass("lastName")}
+                    style={inputStyle}
+                  />
+
+                  {fieldErrors.lastName && (
+                    <p className="mt-1 text-xs font-medium text-rose-400">
+                      {fieldErrors.lastName}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label
+                    className="mb-1 block text-xs font-semibold"
+                    style={{ color: "var(--foreground)" }}
+                  >
+                    Correo Electrónico
+                  </label>
+
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    disabled
+                    className={getInputClass()}
+                    style={{
+                      ...inputStyle,
+                      opacity: 0.6,
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label
+                    className="mb-1 block text-xs font-semibold"
+                    style={{ color: "var(--foreground)" }}
+                  >
+                    Teléfono Celular
+                  </label>
+
+                  <input
+                    type="text"
+                    name="mobile"
+                    value={formData.mobile}
+                    onChange={handleChange}
+                    className={getInputClass("mobile")}
+                    style={inputStyle}
+                  />
+
+                  {fieldErrors.mobile && (
+                    <p className="mt-1 text-xs font-medium text-rose-400">
+                      {fieldErrors.mobile}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h2
+                className="mb-4 border-b pb-1 text-lg font-bold"
+                style={{
+                  color: "var(--foreground)",
+                  borderColor: "var(--border)",
+                }}
+              >
+                Dirección de Entrega
+              </h2>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="sm:col-span-2">
+                  <label
+                    className="mb-1 block text-xs font-semibold"
+                    style={{ color: "var(--foreground)" }}
+                  >
+                    Calle / Avenida y Número
+                  </label>
+
+                  <input
+                    type="text"
+                    name="streetAddress"
+                    value={formData.streetAddress}
+                    onChange={handleChange}
+                    className={getInputClass("streetAddress")}
+                    style={inputStyle}
+                    placeholder="Ej. Av. Siempre Viva 123"
+                  />
+
+                  {fieldErrors.streetAddress && (
+                    <p className="mt-1 text-xs font-medium text-rose-400">
+                      {fieldErrors.streetAddress}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label
+                    className="mb-1 block text-xs font-semibold"
+                    style={{ color: "var(--foreground)" }}
+                  >
+                    Ciudad
+                  </label>
+
+                  <input
+                    type="text"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleChange}
+                    className={getInputClass("city")}
+                    style={inputStyle}
+                  />
+
+                  {fieldErrors.city && (
+                    <p className="mt-1 text-xs font-medium text-rose-400">
+                      {fieldErrors.city}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label
+                    className="mb-1 block text-xs font-semibold"
+                    style={{ color: "var(--foreground)" }}
+                  >
+                    Estado / Departamento
+                  </label>
+
+                  <input
+                    type="text"
+                    name="state"
+                    value={formData.state}
+                    onChange={handleChange}
+                    className={getInputClass("state")}
+                    style={inputStyle}
+                  />
+
+                  {fieldErrors.state && (
+                    <p className="mt-1 text-xs font-medium text-rose-400">
+                      {fieldErrors.state}
+                    </p>
+                  )}
+                </div>
+
+                <div className="sm:col-span-2 md:col-span-1">
+                  <label
+                    className="mb-1 block text-xs font-semibold"
+                    style={{ color: "var(--foreground)" }}
+                  >
+                    Código Postal
+                  </label>
+
+                  <input
+                    type="text"
+                    name="zipCode"
+                    value={formData.zipCode}
+                    onChange={handleChange}
+                    className={getInputClass("zipCode")}
+                    style={inputStyle}
+                  />
+
+                  {fieldErrors.zipCode && (
+                    <p className="mt-1 text-xs font-medium text-rose-400">
+                      {fieldErrors.zipCode}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div
+              className="flex flex-col gap-4 border-t pt-4 sm:flex-row sm:items-center sm:justify-between"
+              style={{ borderColor: "var(--border)" }}
+            >
+              <span className="w-fit rounded bg-white/5 border border-white/10 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-slate-300">
+                Rol: {user?.role ?? "USER"}
+              </span>
+
+              <div className="flex gap-3">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => {
+                    setIsEditing(false);
+                    setFieldErrors({});
+                    setError(null);
+                  }}
+                >
+                  Cancelar
+                </Button>
+                <Button type="submit" isLoading={saving} disabled={saving}>
+                  Guardar ajustes
+                </Button>
+              </div>
+            </div>
+          </form>
+        )}
       </div>
     </PageLayout>
   );

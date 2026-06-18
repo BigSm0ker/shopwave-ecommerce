@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import Alert from "@/components/ui/Alert";
@@ -44,6 +45,7 @@ const INITIAL_FORM: CheckoutFormState = {
 };
 
 export default function CheckoutPage() {
+  const router = useRouter();
   const { cart, clearCart, isMutating } = useCart();
   const [form, setForm] = useState<CheckoutFormState>(INITIAL_FORM);
   const [error, setError] = useState<string | null>(null);
@@ -106,9 +108,12 @@ if (hasFormErrors(nextErrors)) {
       const createdOrder = await orderService.createOrder(payload);
       await clearCart();
       setSuccess(
-        `Pago simulado exitoso. Orden #${createdOrder.id} creada correctamente.`
+        `Pago simulado exitoso. Orden #${createdOrder.id} creada correctamente. Redirigiendo a tu historial de compras...`
       );
       setForm(INITIAL_FORM);
+      setTimeout(() => {
+        router.push("/orders");
+      }, 2500);
     } catch (requestError) {
   setError(
     getErrorMessage(requestError, "No se pudo procesar el checkout.")

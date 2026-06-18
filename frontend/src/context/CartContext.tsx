@@ -62,7 +62,22 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 			try {
 				setIsMutating(true);
 				setError(null);
-				await cartService.addItem(payload);
+				
+				// Buscamos si el producto con la misma talla ya existe en el carrito
+				const existingItem = cart?.cartItems?.find(
+					(item) => item.product.id === payload.productId && item.size === payload.size
+				);
+
+				if (existingItem) {
+					// Si ya existe, actualizamos la cantidad sumándole la nueva cantidad
+					await cartService.updateItem(existingItem.id, {
+						quantity: existingItem.quantity + payload.quantity,
+					});
+				} else {
+					// Si no existe, lo agregamos como un nuevo elemento
+					await cartService.addItem(payload);
+				}
+				
 				await refreshCart();
 			} catch (requestError) {
 				setError(
@@ -75,7 +90,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 				setIsMutating(false);
 			}
 		},
-		[refreshCart]
+		[cart, refreshCart]
 	);
 
 	const updateCartItemQuantity = useCallback(
@@ -126,7 +141,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 		try {
 			setIsMutating(true);
 			setError(null);
-			await Promise.all(cart.cartItems.map((item) => cartService.removeItem(item.id)));
+			// Borrado secuencial para evitar conflictos de concurrencia en la base de datos (Optimistic Lock)
+			for (const item of cart.cartItems) {
+				await cartService.removeItem(item.id);
+			}
 			await refreshCart();
 		} catch (requestError) {
 			setError(
