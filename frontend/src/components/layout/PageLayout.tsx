@@ -1,21 +1,30 @@
+import type { ReactNode } from "react";
+
 interface PageLayoutProps {
-  children: React.ReactNode
+  children: ReactNode;
+  className?: string;
 }
 
 export default function PageLayout({
-  children
+  children,
+  className = "",
 }: PageLayoutProps) {
   return (
     <main
-      className="
+      className={`
+        mx-auto
         w-full
         max-w-7xl
-        mx-auto
-        px-6
-        py-10
-      "
+        px-4
+        py-6
+        sm:px-6
+        sm:py-8
+        lg:px-8
+        lg:py-10
+        ${className}
+      `}
     >
       {children}
     </main>
-  )
+  );
 }
