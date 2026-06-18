@@ -1,43 +1,65 @@
 "use client";
 
-import { useEffect, useState, FormEvent } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { AuthGuard } from "@/guards/AuthGuard";
 import PageLayout from "@/components/layout/PageLayout";
+import Alert from "@/components/ui/Alert";
+import Button from "@/components/ui/Button";
+import Skeleton from "@/components/ui/Skeleton";
 import { useAuth } from "@/hooks/useAuth";
 import { userService } from "@/services/user.service";
 import type { UserProfile, Address } from "@/models/user.model";
+import type { FieldErrors, ProfileField } from "@/utils/validation.util";
+import {
+  getErrorMessage,
+  hasFormErrors,
+  validateProfileForm,
+} from "@/utils/validation.util";
+
+interface ProfileFormState {
+  firstName: string;
+  lastName: string;
+  email: string;
+  mobile: string;
+  streetAddress: string;
+  city: string;
+  state: string;
+  zipCode: string;
+}
+
+const initialFormState: ProfileFormState = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  mobile: "",
+  streetAddress: "",
+  city: "",
+  state: "",
+  zipCode: "",
+};
 
 function ProfileContent() {
   const { user } = useAuth();
+
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
-
-  // Estado del formulario mapeado al contrato JSON del backend
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    mobile: "",
-    streetAddress: "",
-    city: "",
-    state: "",
-    zipCode: "",
-  });
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors<ProfileField>>({});
+  const [formData, setFormData] = useState<ProfileFormState>(initialFormState);
 
   useEffect(() => {
     async function loadFullProfile() {
-      if (!user) return;
+      if (!user) {
+        setLoading(false);
+        return;
+      }
 
       try {
-        // Obtenemos los datos detallados (incluyendo el arreglo de direcciones)
-        const data = await userService.getProfile();
+        setError(null);
 
-        const primaryAddress =
-          data.addresses && data.addresses.length > 0
-            ? data.addresses[0]
-            : null;
+        const data = await userService.getProfile();
+        const primaryAddress = data.addresses?.[0] ?? null;
 
         setFormData({
           firstName: data.firstName || user.firstName || "",
@@ -49,9 +71,13 @@ function ProfileContent() {
           state: primaryAddress?.state || "",
           zipCode: primaryAddress?.zipCode || "",
         });
-      } catch (err) {
-        setError("No se pudo sincronizar la información del perfil.");
-        console.error(err);
+      } catch (requestError) {
+        setError(
+          getErrorMessage(
+            requestError,
+            "No se pudo sincronizar la información del perfil."
+          )
+        );
       } finally {
         setLoading(false);
       }
@@ -60,56 +86,122 @@ function ProfileContent() {
     loadFullProfile();
   }, [user]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setSuccess(false);
+
+    setFieldErrors((current) => ({
+      ...current,
+      [name]: undefined,
+    }));
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+
     setSaving(true);
     setError(null);
     setSuccess(false);
 
+    const nextErrors = validateProfileForm(formData);
+    setFieldErrors(nextErrors);
+
+    if (hasFormErrors(nextErrors)) {
+      setError("Corrige los campos marcados antes de guardar.");
+      setSaving(false);
+      return;
+    }
+
     try {
       const updatedAddress: Address = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        streetAddress: formData.streetAddress,
-        city: formData.city,
-        state: formData.state,
-        zipCode: formData.zipCode,
-        mobile: formData.mobile,
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        streetAddress: formData.streetAddress.trim(),
+        city: formData.city.trim(),
+        state: formData.state.trim(),
+        zipCode: formData.zipCode.trim(),
+        mobile: formData.mobile.trim(),
       };
 
       const updatedProfile: Partial<UserProfile> = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        mobile: formData.mobile,
-        // Si ya existía una dirección la modificamos, de lo contrario inicializamos el arreglo
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        mobile: formData.mobile.trim(),
         addresses: [updatedAddress],
       };
 
       await userService.updateProfile(updatedProfile);
       setSuccess(true);
-    } catch (err) {
-      setError("Error al guardar los cambios en el servidor.");
-      console.error(err);
+    } catch (requestError) {
+      setError(
+        getErrorMessage(
+          requestError,
+          "Error al guardar los cambios en el servidor."
+        )
+      );
     } finally {
       setSaving(false);
     }
   };
 
+  const inputBaseClass =
+    "w-full rounded-xl border p-2.5 text-sm transition focus:outline-none focus:ring-2 disabled:cursor-not-allowed";
+
+  const getInputClass = (field?: ProfileField) => {
+    const hasError = field ? Boolean(fieldErrors[field]) : false;
+
+    return `${inputBaseClass} ${
+      hasError
+        ? "border-rose-400 focus:ring-rose-400/30"
+        : "focus:ring-[var(--primary)]"
+    }`;
+  };
+
+  const inputStyle = {
+    borderColor: "var(--border)",
+    color: "var(--foreground)",
+  };
+
   if (loading) {
     return (
       <PageLayout>
-        <div className="max-w-3xl mx-auto py-12 text-center">
-          <p
-            className="font-semibold animate-pulse"
-            style={{ color: "var(--foreground)" }}
+        <div className="mx-auto max-w-3xl py-6">
+          <div className="mb-8 space-y-3">
+            <Skeleton className="h-8 w-40" />
+            <Skeleton className="h-4 w-full max-w-xl" />
+          </div>
+
+          <div
+            className="space-y-6 rounded-2xl border p-6 shadow-sm"
+            style={{
+              backgroundColor: "var(--surface)",
+              borderColor: "var(--border)",
+            }}
           >
-            Cargando datos de cuenta...
-          </p>
+            <Skeleton className="h-6 w-44" />
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {[1, 2, 3, 4].map((item) => (
+                <div key={item} className="space-y-2">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-11 w-full rounded-xl" />
+                </div>
+              ))}
+            </div>
+
+            <Skeleton className="h-6 w-52" />
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {[1, 2, 3, 4].map((item) => (
+                <div key={item} className="space-y-2">
+                  <Skeleton className="h-4 w-28" />
+                  <Skeleton className="h-11 w-full rounded-xl" />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </PageLayout>
     );
@@ -117,13 +209,14 @@ function ProfileContent() {
 
   return (
     <PageLayout>
-      <div className="max-w-3xl mx-auto py-6">
+      <div className="mx-auto max-w-3xl py-6">
         <h1
-          className="text-3xl font-bold mb-2"
+          className="mb-2 text-3xl font-bold"
           style={{ color: "var(--foreground)" }}
         >
           Mi Perfil
         </h1>
+
         <p
           className="mb-8 text-sm"
           style={{ color: "var(--foreground)", opacity: 0.8 }}
@@ -134,27 +227,24 @@ function ProfileContent() {
 
         <form
           onSubmit={handleSubmit}
-          className="p-6 rounded-2xl border shadow-sm space-y-6 transition-all"
+          className="space-y-6 rounded-2xl border p-4 shadow-sm transition-all sm:p-6"
           style={{
             backgroundColor: "var(--surface)",
             borderColor: "var(--border)",
           }}
         >
-          {error && (
-            <div className="p-3 bg-red-100/80 text-red-800 rounded-xl text-sm border border-red-200">
-              {error}
-            </div>
-          )}
+          {error && <Alert message={error} type="error" />}
+
           {success && (
-            <div className="p-3 bg-green-100/80 text-green-800 rounded-xl text-sm border border-green-200">
-              ¡Tus cambios han sido guardados con éxito!
-            </div>
+            <Alert
+              message="Tus cambios han sido guardados con éxito."
+              type="success"
+            />
           )}
 
-          {/* SECCIÓN: Cuenta */}
           <div>
             <h2
-              className="text-lg font-bold mb-4 border-b pb-1"
+              className="mb-4 border-b pb-1 text-lg font-bold"
               style={{
                 color: "var(--foreground)",
                 borderColor: "var(--border)",
@@ -162,93 +252,106 @@ function ProfileContent() {
             >
               Datos de Usuario
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label
-                  className="block text-xs font-semibold mb-1"
+                  className="mb-1 block text-xs font-semibold"
                   style={{ color: "var(--foreground)" }}
                 >
                   Nombre
                 </label>
+
                 <input
                   type="text"
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleChange}
-                  className="w-full p-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-sm"
-                  style={{
-                    borderColor: "var(--border)",
-                    color: "var(--foreground)",
-                  }}
-                  required
+                  className={getInputClass("firstName")}
+                  style={inputStyle}
                 />
+
+                {fieldErrors.firstName && (
+                  <p className="mt-1 text-xs font-medium text-rose-400">
+                    {fieldErrors.firstName}
+                  </p>
+                )}
               </div>
+
               <div>
                 <label
-                  className="block text-xs font-semibold mb-1"
+                  className="mb-1 block text-xs font-semibold"
                   style={{ color: "var(--foreground)" }}
                 >
                   Apellido
                 </label>
+
                 <input
                   type="text"
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleChange}
-                  className="w-full p-2.5 border rounded-xl focus:outline-none focus:ring-1 text-sm"
-                  style={{
-                    borderColor: "var(--border)",
-                    color: "var(--foreground)",
-                  }}
-                  required
+                  className={getInputClass("lastName")}
+                  style={inputStyle}
                 />
+
+                {fieldErrors.lastName && (
+                  <p className="mt-1 text-xs font-medium text-rose-400">
+                    {fieldErrors.lastName}
+                  </p>
+                )}
               </div>
+
               <div>
                 <label
-                  className="block text-xs font-semibold mb-1"
+                  className="mb-1 block text-xs font-semibold"
                   style={{ color: "var(--foreground)" }}
                 >
                   Correo Electrónico
                 </label>
+
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   disabled
-                  className="w-full p-2.5 border rounded-xl bg-slate-50 cursor-not-allowed text-sm"
+                  className={getInputClass()}
                   style={{
-                    borderColor: "var(--border)",
-                    color: "var(--foreground)",
+                    ...inputStyle,
                     opacity: 0.6,
                   }}
                 />
               </div>
+
               <div>
                 <label
-                  className="block text-xs font-semibold mb-1"
+                  className="mb-1 block text-xs font-semibold"
                   style={{ color: "var(--foreground)" }}
                 >
                   Teléfono Celular
                 </label>
+
                 <input
                   type="text"
                   name="mobile"
                   value={formData.mobile}
                   onChange={handleChange}
-                  className="w-full p-2.5 border rounded-xl focus:outline-none focus:ring-1 text-sm"
-                  style={{
-                    borderColor: "var(--border)",
-                    color: "var(--foreground)",
-                  }}
-                  required
+                  className={getInputClass("mobile")}
+                  style={inputStyle}
                 />
+
+                {fieldErrors.mobile && (
+                  <p className="mt-1 text-xs font-medium text-rose-400">
+                    {fieldErrors.mobile}
+                  </p>
+                )}
               </div>
             </div>
           </div>
 
           <div>
             <h2
-              className="text-lg font-bold mb-4 border-b pb-1"
+              className="mb-4 border-b pb-1 text-lg font-bold"
               style={{
                 color: "var(--foreground)",
                 borderColor: "var(--border)",
@@ -256,115 +359,121 @@ function ProfileContent() {
             >
               Dirección de Entrega
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
                 <label
-                  className="block text-xs font-semibold mb-1"
+                  className="mb-1 block text-xs font-semibold"
                   style={{ color: "var(--foreground)" }}
                 >
                   Calle / Avenida y Número
                 </label>
+
                 <input
                   type="text"
                   name="streetAddress"
                   value={formData.streetAddress}
                   onChange={handleChange}
-                  className="w-full p-2.5 border rounded-xl focus:outline-none focus:ring-1 text-sm"
-                  style={{
-                    borderColor: "var(--border)",
-                    color: "var(--foreground)",
-                  }}
+                  className={getInputClass("streetAddress")}
+                  style={inputStyle}
                   placeholder="Ej. Av. Siempre Viva 123"
-                  required
                 />
+
+                {fieldErrors.streetAddress && (
+                  <p className="mt-1 text-xs font-medium text-rose-400">
+                    {fieldErrors.streetAddress}
+                  </p>
+                )}
               </div>
+
               <div>
                 <label
-                  className="block text-xs font-semibold mb-1"
+                  className="mb-1 block text-xs font-semibold"
                   style={{ color: "var(--foreground)" }}
                 >
                   Ciudad
                 </label>
+
                 <input
                   type="text"
                   name="city"
                   value={formData.city}
                   onChange={handleChange}
-                  className="w-full p-2.5 border rounded-xl focus:outline-none focus:ring-1 text-sm"
-                  style={{
-                    borderColor: "var(--border)",
-                    color: "var(--foreground)",
-                  }}
-                  required
+                  className={getInputClass("city")}
+                  style={inputStyle}
                 />
+
+                {fieldErrors.city && (
+                  <p className="mt-1 text-xs font-medium text-rose-400">
+                    {fieldErrors.city}
+                  </p>
+                )}
               </div>
+
               <div>
                 <label
-                  className="block text-xs font-semibold mb-1"
+                  className="mb-1 block text-xs font-semibold"
                   style={{ color: "var(--foreground)" }}
                 >
                   Estado / Departamento
                 </label>
+
                 <input
                   type="text"
                   name="state"
                   value={formData.state}
                   onChange={handleChange}
-                  className="w-full p-2.5 border rounded-xl focus:outline-none focus:ring-1 text-sm"
-                  style={{
-                    borderColor: "var(--border)",
-                    color: "var(--foreground)",
-                  }}
-                  required
+                  className={getInputClass("state")}
+                  style={inputStyle}
                 />
+
+                {fieldErrors.state && (
+                  <p className="mt-1 text-xs font-medium text-rose-400">
+                    {fieldErrors.state}
+                  </p>
+                )}
               </div>
+
               <div className="sm:col-span-2 md:col-span-1">
                 <label
-                  className="block text-xs font-semibold mb-1"
+                  className="mb-1 block text-xs font-semibold"
                   style={{ color: "var(--foreground)" }}
                 >
                   Código Postal
                 </label>
+
                 <input
                   type="text"
                   name="zipCode"
                   value={formData.zipCode}
                   onChange={handleChange}
-                  className="w-full p-2.5 border rounded-xl focus:outline-none focus:ring-1 text-sm"
-                  style={{
-                    borderColor: "var(--border)",
-                    color: "var(--foreground)",
-                  }}
-                  required
+                  className={getInputClass("zipCode")}
+                  style={inputStyle}
                 />
+
+                {fieldErrors.zipCode && (
+                  <p className="mt-1 text-xs font-medium text-rose-400">
+                    {fieldErrors.zipCode}
+                  </p>
+                )}
               </div>
             </div>
           </div>
 
-          {/* Área de Envío */}
           <div
-            className="flex justify-between items-center pt-4 border-t"
+            className="flex flex-col gap-4 border-t pt-4 sm:flex-row sm:items-center sm:justify-between"
             style={{ borderColor: "var(--border)" }}
           >
             <span
-              className="text-xs uppercase font-bold tracking-wider px-2.5 py-1 rounded bg-slate-100"
+              className="w-fit rounded bg-slate-100 px-2.5 py-1 text-xs font-bold uppercase tracking-wider"
               style={{ color: "var(--foreground)" }}
             >
-              Rol: {user?.role}
+              Rol: {user?.role ?? "USER"}
             </span>
-            <button
-              type="submit"
-              disabled={saving}
-              className="px-6 py-2.5 text-sm font-bold rounded-xl transition-all shadow-sm cursor-pointer"
-              style={{
-                backgroundColor: saving
-                  ? "var(--primary-hover)"
-                  : "var(--primary)",
-                color: "var(--surface)",
-              }}
-            >
-              {saving ? "Guardando..." : "Guardar Ajustes"}
-            </button>
+
+            <Button type="submit" isLoading={saving} disabled={saving}>
+              Guardar ajustes
+            </Button>
           </div>
         </form>
       </div>

@@ -10,6 +10,12 @@ import { AuthGuard } from "@/guards/AuthGuard";
 import type { CreateOrderRequest, PaymentMethod } from "@/models/order.model";
 import { orderService } from "@/services/order.service";
 import { useCart } from "@/hooks/useCart";
+import type { CheckoutField, FieldErrors } from "@/utils/validation.util";
+import {
+  getErrorMessage,
+  hasFormErrors,
+  validateCheckoutForm,
+} from "@/utils/validation.util";
 
 interface CheckoutFormState {
   firstName: string;
@@ -42,37 +48,27 @@ export default function CheckoutPage() {
   const [form, setForm] = useState<CheckoutFormState>(INITIAL_FORM);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors<CheckoutField>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isCartEmpty = !cart || cart.cartItems.length === 0;
 
-  const formErrors = useMemo(() => {
-    return {
-      firstName: form.firstName.trim() ? "" : "Nombre requerido",
-      lastName: form.lastName.trim() ? "" : "Apellido requerido",
-      streetAddress: form.streetAddress.trim() ? "" : "Dirección requerida",
-      city: form.city.trim() ? "" : "Ciudad requerida",
-      state: form.state.trim() ? "" : "Departamento/Estado requerido",
-      zipCode: /^\d{4,10}$/.test(form.zipCode.trim())
-        ? ""
-        : "Código postal inválido",
-      mobile: /^\+?[0-9\s-]{7,15}$/.test(form.mobile.trim())
-        ? ""
-        : "Teléfono inválido",
-      cardholderName: form.cardholderName.trim() ? "" : "Titular requerido",
-      cardNumber: /^\d{13,19}$/.test(form.cardNumber.replace(/\s/g, ""))
-        ? ""
-        : "Número de tarjeta inválido",
-    };
-  }, [form]);
-
-  const hasValidationErrors = Object.values(formErrors).some(Boolean);
-
   const onFieldChange =
-    (field: keyof CheckoutFormState) =>
-    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-      setForm((current) => ({ ...current, [field]: event.target.value }));
-    };
+  (field: keyof CheckoutFormState) =>
+  (
+    event: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    setForm((current) => ({ ...current, [field]: event.target.value }));
+
+    if (field !== "paymentMethod") {
+      setFieldErrors((current) => ({
+        ...current,
+        [field]: undefined,
+      }));
+    }
+  };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -84,10 +80,13 @@ export default function CheckoutPage() {
       return;
     }
 
-    if (hasValidationErrors) {
-      setError("Revisa los datos del formulario antes de continuar.");
-      return;
-    }
+    const nextErrors = validateCheckoutForm(form);
+setFieldErrors(nextErrors);
+
+if (hasFormErrors(nextErrors)) {
+  setError("Revisa los datos marcados antes de continuar.");
+  return;
+}
 
     const payload: CreateOrderRequest = {
       firstName: form.firstName.trim(),
@@ -111,14 +110,12 @@ export default function CheckoutPage() {
       );
       setForm(INITIAL_FORM);
     } catch (requestError) {
-      setError(
-        requestError instanceof Error
-          ? requestError.message
-          : "No se pudo procesar el checkout."
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
+  setError(
+    getErrorMessage(requestError, "No se pudo procesar el checkout.")
+  );
+} finally {
+  setIsSubmitting(false);
+}
   };
 
   return (
@@ -142,14 +139,14 @@ export default function CheckoutPage() {
                 name="firstName"
                 value={form.firstName}
                 onChange={onFieldChange("firstName")}
-                error={formErrors.firstName || null}
+                error={fieldErrors.firstName ?? null}
               />
               <Input
                 label="Apellido"
                 name="lastName"
                 value={form.lastName}
                 onChange={onFieldChange("lastName")}
-                error={formErrors.lastName || null}
+                error={fieldErrors.lastName ?? null}
               />
             </div>
 
@@ -158,7 +155,7 @@ export default function CheckoutPage() {
               name="streetAddress"
               value={form.streetAddress}
               onChange={onFieldChange("streetAddress")}
-              error={formErrors.streetAddress || null}
+              error={fieldErrors.streetAddress ?? null}
             />
 
             <div className="grid gap-4 sm:grid-cols-3">
@@ -167,21 +164,21 @@ export default function CheckoutPage() {
                 name="city"
                 value={form.city}
                 onChange={onFieldChange("city")}
-                error={formErrors.city || null}
+                error={fieldErrors.city ?? null}
               />
               <Input
                 label="Departamento/Estado"
                 name="state"
                 value={form.state}
                 onChange={onFieldChange("state")}
-                error={formErrors.state || null}
+                error={fieldErrors.state ?? null}
               />
               <Input
                 label="Código postal"
                 name="zipCode"
                 value={form.zipCode}
                 onChange={onFieldChange("zipCode")}
-                error={formErrors.zipCode || null}
+                error={fieldErrors.zipCode ?? null}
               />
             </div>
 
@@ -190,7 +187,7 @@ export default function CheckoutPage() {
               name="mobile"
               value={form.mobile}
               onChange={onFieldChange("mobile")}
-              error={formErrors.mobile || null}
+              error={fieldErrors.mobile ?? null}
             />
 
             <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
@@ -204,14 +201,14 @@ export default function CheckoutPage() {
                   name="cardholderName"
                   value={form.cardholderName}
                   onChange={onFieldChange("cardholderName")}
-                  error={formErrors.cardholderName || null}
+                  error={fieldErrors.cardholderName ?? null}
                 />
                 <Input
                   label="Número de tarjeta"
                   name="cardNumber"
                   value={form.cardNumber}
                   onChange={onFieldChange("cardNumber")}
-                  error={formErrors.cardNumber || null}
+                  error={fieldErrors.cardNumber ?? null}
                 />
               </div>
 
@@ -250,7 +247,7 @@ export default function CheckoutPage() {
             <Button
               type="submit"
               isLoading={isSubmitting}
-              disabled={isCartEmpty || hasValidationErrors || isMutating}
+              disabled={isCartEmpty || isSubmitting || isMutating}
               className="w-full sm:w-auto"
             >
               Confirmar compra
