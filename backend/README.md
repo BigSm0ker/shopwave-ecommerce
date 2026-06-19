@@ -65,7 +65,7 @@ Deben aparecer:
 #### phpMyAdmin:
 `http://localhost:8081`
 
-**Datos de acceso:**
+**Datos de acceso:** 
 - **Servidor:** `mysql`
 - **Usuario:** `root`
 - **Contraseña:** `root`

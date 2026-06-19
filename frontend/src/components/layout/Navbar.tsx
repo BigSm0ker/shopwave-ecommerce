@@ -92,6 +92,12 @@ export default function Navbar() {
           {isAuthenticated ? (
             <div className="flex items-center gap-4">
               <Link 
+                href="/orders" 
+                className="text-sm font-semibold text-slate-200 hover:text-cyan-300 transition duration-200"
+              >
+                Mis Compras
+              </Link>
+              <Link 
                 href="/profile" 
                 className="text-sm font-semibold text-slate-200 hover:text-cyan-300 flex items-center gap-1.5 transition duration-200"
               >
@@ -184,6 +190,9 @@ export default function Navbar() {
 
           {isAuthenticated ? (
             <div className="flex flex-col gap-4">
+              <Link href="/orders" className="text-sm font-semibold text-slate-200 hover:text-cyan-300 transition duration-200">
+                Mis Compras
+              </Link>
               <Link href="/profile" className="text-sm font-semibold text-slate-200 flex items-center gap-1.5">
                 <UserCircle2 size={18} className="text-cyan-400" />
                 {user ? user.firstName : "Perfil"}

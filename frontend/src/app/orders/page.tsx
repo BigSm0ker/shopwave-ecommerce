@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { AuthGuard } from "@/guards/AuthGuard";
 import PageLayout from "@/components/layout/PageLayout";
 import { orderService } from "@/services/order.service";
 import type { Order, OrderItem, OrderStatus } from "@/models/order.model";
 
 function OrdersContent() {
+  const pathname = usePathname();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -88,6 +91,30 @@ function OrdersContent() {
       >
         Revisa el estado de tus pedidos y el histórico de tus transacciones.
       </p>
+
+      {/* Pestañas de Navegación de Cuenta */}
+      <div className="flex gap-4 border-b border-white/10 pb-4 mb-6">
+        <Link
+          href="/profile"
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            pathname === "/profile"
+              ? "bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-400/10"
+              : "text-slate-300 hover:text-white hover:bg-white/5 border border-white/10"
+          }`}
+        >
+          Mi Perfil
+        </Link>
+        <Link
+          href="/orders"
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            pathname === "/orders"
+              ? "bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-400/10"
+              : "text-slate-300 hover:text-white hover:bg-white/5 border border-white/10"
+          }`}
+        >
+          Mis Pedidos
+        </Link>
+      </div>
 
       {error && (
         <div className="p-4 mb-6 bg-red-100 text-red-800 rounded-xl border border-red-200 text-sm">
@@ -298,8 +325,7 @@ function OrdersContent() {
 
                 {selectedOrder.paymentDetails?.paymentMethod && (
                   <div
-                    className="text-xs text-center uppercase tracking-wider font-bold p-2 rounded-lg bg-slate-50"
-                    style={{ color: "var(--foreground)", opacity: 0.7 }}
+                    className="text-xs text-center uppercase tracking-wider font-bold p-2.5 rounded-xl border border-white/10 bg-white/5 text-cyan-300"
                   >
                     Pago:{" "}
                     {selectedOrder.paymentDetails.paymentMethod.replace(
